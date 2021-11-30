@@ -1,6 +1,6 @@
 {
-    "name": "phyowailinn/payment",
-    "description": "This demo package for dynamic payment gateway",
+    "name": "yomastrategic/yomafleet-payment-gateway",
+    "description": "Yoma Fleet Payment Gateway Package for Visa, Master, JCB, Wave , Kpay,etc...",
     "license": "MIT",
     "keywords": ["laravel", "payment", "gateway"],
     "authors": [
@@ -21,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Phyowailinn\\Payment\\PaymentGatewayServiceProvider"
+                "Yomastrategic\\YomafleetPaymentGateway\\PaymentGatewayServiceProvider"
             ]
         }
     },
