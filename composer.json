@@ -1,5 +1,5 @@
 {
-    "name": "yomastrategic/yomafleet-payment-gateway",
+    "name": "yomastrategic/yomafleet-payment",
     "description": "Yoma Fleet Payment Gateway Package for Visa, Master, JCB, Wave , Kpay,etc...",
     "license": "MIT",
     "keywords": ["laravel", "payment", "gateway"],
@@ -15,13 +15,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Phyowailinn\\YomafleetPaymentGateway\\": "src"
+            "Phyowailinn\\Yomafleet\\Payment\\": "src"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Yomastrategic\\YomafleetPaymentGateway\\PaymentGatewayServiceProvider"
+                "Yomastrategic\\Yomafleet\\Payment\\PaymentGatewayServiceProvider"
             ]
         }
     },

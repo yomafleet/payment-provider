@@ -1,6 +1,6 @@
 <?php
 
-namespace Yomastrategic\YomafleetPaymentGateway;
+namespace Yomastrategic\Yomafleet\Payment;
 
 use Yomastrategic\YomafleetPaymentGateway\MpgsGateway;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;

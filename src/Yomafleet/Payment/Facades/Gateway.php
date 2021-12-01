@@ -1,6 +1,6 @@
 <?php
 
-namespace Yomastrategic\YomafleetPaymentGateway\Facades;
+namespace Yomastrategic\Yomafleet\Payment;
 
 use Illuminate\Support\Facades\Facade;
 
