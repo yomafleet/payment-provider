@@ -1,6 +1,6 @@
 <?php
 
-namespace Yomastrategic\Yomafleet\Payment\Facades;
+namespace Yomastrategic\YomafleetPayment\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
@@ -12,6 +12,6 @@ class Gateway extends Facade
      *
      * @return string
      */
-    protected static function getFacadeAccessor() { return 'payment.gateway'; }
+    protected static function getFacadeAccessor() { return 'gateway'; }
 
 }

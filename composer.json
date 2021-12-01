@@ -22,7 +22,10 @@
         "laravel": {
             "providers": [
                 "Yomastrategic\\YomafleetPayment\\PaymentGatewayServiceProvider"
-            ]
+            ],
+            "aliases": {
+                "Gateway": "Yomastrategic\\YomafleetPayment\\Facades\\Gateway"
+            }
         }
     },
     "minimum-stability": "dev"
