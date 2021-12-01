@@ -1,6 +1,6 @@
 <?php
 
-namespace Yomastrategic\Yomafleet\Payment;
+namespace Yomastrategic\YomafleetPayment;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -40,8 +40,8 @@ class PaymentGatewayServiceProvider extends ServiceProvider
      *
      * @return array
      */
-    public function provides()
-    {
-        return array('payment.gateway');
-    }
+    // public function provides()
+    // {
+    //     return array('payment.gateway');
+    // }
 }
