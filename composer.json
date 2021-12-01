@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Phyowailinn\\Yomafleet\\Payment\\": "src"
+            "Yomastrategic\\Yomafleet\\Payment\\": "src"
         }
     },
     "extra": {
