@@ -1,6 +1,6 @@
 <?php
 
-namespace Yomastrategic\Payment;
+namespace Yomastrategic\YomafleetPaymentGateway;
 
 use Illuminate\Support\ServiceProvider;
 

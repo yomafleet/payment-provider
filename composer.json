@@ -15,13 +15,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Phyowailinn\\Payment\\": "src"
+            "Phyowailinn\\YomafleetPaymentGateway\\": "src"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Yomastrategic\\Payment\\PaymentGatewayServiceProvider"
+                "Yomastrategic\\YomafleetPaymentGateway\\PaymentGatewayServiceProvider"
             ]
         }
     },
