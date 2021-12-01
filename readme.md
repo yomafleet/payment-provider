@@ -10,16 +10,16 @@ Require this package in your composer.json and update composer.
 
 After updating composer, add the ServiceProvider to the providers array in config/app.php
 
-    Yomastrategic\YomafleetPaymentGateway\PaymentGatewayServiceProvider::class,
+    Yomastrategic\Payment\PaymentGatewayServiceProvider::class,
 
 You can optionally use the facade for shorter code. Add this to your facades:
 
-    'Gateway' => Yomastrategic\YomafleetPaymentGateway\Facades\Gateway::class,
+    'Gateway' => Yomastrategic\Payment\Facades\Gateway::class,
 
 ## Using
 
 Use the facade:
-	use Yomastrategic\YomafleetPaymentGateway\Facades\Gateway;
+	use Yomastrategic\Payment\Facades\Gateway;
 
     $result = Gateway::request();
     return $result->verify($data);
@@ -30,4 +30,4 @@ You can also use your ConfigProvider to set certain keys.
 ### Configuration
 The defaults configuration settings are set in `config/payment.php`. Copy this file to your own config directory to modify the values. You can publish the config using this command:
 
-    php artisan vendor:publish --provider="Yomastrategic\YomafleetPaymentGateway\PaymentGatewayServiceProvider"
+    php artisan vendor:publish --provider="Yomastrategic\Payment\PaymentGatewayServiceProvider"

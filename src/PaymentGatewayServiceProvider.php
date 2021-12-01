@@ -1,6 +1,6 @@
 <?php
 
-namespace Yomastrategic\YomafleetPaymentGateway;
+namespace Yomastrategic\Payment;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -30,7 +30,7 @@ class PaymentGatewayServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('yomafleet-payment-gateway.gateway', function ($app) {
+        $this->app->bind('payment.gateway', function ($app) {
             return new Gateway();
         });
     }
@@ -42,6 +42,6 @@ class PaymentGatewayServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('yomafleet-payment-gateway.gateway');
+        return array('payment.gateway');
     }
 }

@@ -21,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Yomastrategic\\YomafleetPaymentGateway\\PaymentGatewayServiceProvider"
+                "Yomastrategic\\Payment\\PaymentGatewayServiceProvider"
             ]
         }
     },
