@@ -30,7 +30,7 @@ class PaymentGatewayServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(Gateway::class, function ($app) {
+        $this->app->bind('gateway', function ($app) {
             return new Gateway();
         });
     }
