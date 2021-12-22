@@ -2,7 +2,7 @@
 
 Require this package in your composer.json and update composer.
 
-    composer require yomastrategic/yomafleet-payment
+    composer require yomafleet/payment-provider
 
 ## Installation
 
