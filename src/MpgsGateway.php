@@ -1,6 +1,6 @@
 <?php 
 
-namespace Yomastrategic\YomafleetPayment;
+namespace Yomafleet\PaymentProvider;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
