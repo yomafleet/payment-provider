@@ -13,6 +13,7 @@ return [
     'default' => env('PAYMENT_GATEWAY', 'mpgs'),
 
     'mpgs' => [
+        'version' => env('MPGS_VERSION'),
         'url' => env('MPGS_GATEWAY_URL'),
         'merchant_id' => env('MPGS_MERCHANT_ID'),
         'operator_id' => env('MPGS_OPERATOR_ID'),
