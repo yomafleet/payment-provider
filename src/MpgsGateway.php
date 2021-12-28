@@ -30,9 +30,8 @@ trait MpgsGateway {
         ];
 
         $verify = $this->request_api($url, $method, $data);
-        dd($verify);
+        
         if ($verify->result !== 'SUCCESS') {
-            
             return [
                 'success' => false, 
                 'message' => 'Your card issuer bank has declined. Please contact your bank for support.',
