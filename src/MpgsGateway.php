@@ -30,7 +30,7 @@ trait MpgsGateway {
         ];
 
         $verify = $this->request_api($url, $method, $data);
-        
+        dd($verify);
         if ($verify->result !== 'SUCCESS') {
             
             return [
