@@ -32,11 +32,12 @@ trait MpgsGateway {
         $verify = $this->request_api($url, $method, $data);
         
         if ($verify->result !== 'SUCCESS') {
-         return [
-             'success' => false, 
-             'message' => 'Your card issuer bank has declined. Please contact your bank for support.',
-             //'error_message' => [$verify->error->cause => [$verify->error->explanation]]
-         ];
+            
+            return [
+                'success' => false, 
+                'message' => 'Your card issuer bank has declined. Please contact your bank for support.',
+                'error_message' => [$verify->error->cause => [$verify->error->explanation]]
+            ];
         }
 
         $result = $this->getToken($attributes['session_id']);
