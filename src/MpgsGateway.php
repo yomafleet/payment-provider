@@ -161,6 +161,44 @@ trait MpgsGateway {
         return $this->request_api($url, $method, $data);
     }
 
+    public function pay($info, $token)
+    {
+        $url = "{$this->config['url']}{$this->config['merchant_id']}/order/{$info['order_id']}/transaction/{$info['transaction_id']}";
+
+        $method = 'PUT';
+        $data = [
+            'apiOperation' => 'PAY',
+            'order' => [
+                'currency' => 'MMK',
+                'amount' => $info['amount']
+            ],
+            'sourceOfFunds' => [
+                'token' => $token
+            ],
+        ];
+       
+        return $this->request_api($url, $method, $data);
+    }
+
+    public function prepay($info, $token)
+    {
+        $url = "{$this->config['url']}{$this->config['merchant_id']}/order/{$info['order_id']}/transaction/{$info['transaction_id']}";
+
+        $method = 'PUT';
+        $data = [
+            'apiOperation' => 'AUTHORIZE',
+            'order' => [
+                'currency' => 'MMK',
+                'amount' => $info['amount']
+            ],
+            'sourceOfFunds' => [
+                'token' => $token
+            ],
+        ];
+       
+        return $this->request_api($url, $method, $data);
+    }
+
     private function request_api($url,$method,$data=[])
     {
         $data = json_encode($data);
