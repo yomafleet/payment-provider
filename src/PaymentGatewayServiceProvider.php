@@ -11,7 +11,6 @@ class PaymentGatewayServiceProvider extends ServiceProvider
      *
      * @return void
      */
-
     protected $defer = false;
 
     public function boot()

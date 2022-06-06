@@ -1,47 +1,46 @@
-<?php 
+<?php
 
 namespace Yomafleet\PaymentProvider;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
-trait MpgsGateway {
-
+trait MpgsGateway
+{
     public $config;
-    
+
     public function setConfig($config)
     {
         $this->config = $config;
     }
 
     public function verify($attributes)
-    {   
+    {
         $url = "{$this->config['url']}{$this->config['merchant_id']}/order/{$attributes['order_id']}/transaction/{$attributes['transaction_id']}";
         $method = 'PUT';
-        
+
         $data = [
             'apiOperation' => 'VERIFY',
-            'order' => [
+            'order'        => [
                 'currency' => 'MMK',
             ],
             'session' => [
-             'id' =>$attributes['session_id'],
-         ],
+                'id' => $attributes['session_id'],
+            ],
         ];
 
         $verify = $this->request_api($url, $method, $data);
-        
+
         if ($verify->result !== 'SUCCESS') {
-            
             return [
-                'success' => false, 
-                'message' => 'Your card issuer bank has declined. Please contact your bank for support.',
-                'error_message' => isset($verify->error) ? $verify->error->explanation : null
+                'success'       => false,
+                'message'       => 'Your card issuer bank has declined. Please contact your bank for support.',
+                'error_message' => isset($verify->error) ? $verify->error->explanation : null,
             ];
         }
 
         $result = $this->getToken($attributes['session_id']);
-        
+
         if ($result) {
             return ['success' => true, 'data' => $result];
         }
@@ -55,7 +54,7 @@ trait MpgsGateway {
         $method = 'POST';
         $data = [
             'session' => [
-                'id' =>$sessionId,
+                'id' => $sessionId,
             ],
             'sourceOfFunds' => [
                 'type' => 'CARD',
@@ -63,8 +62,10 @@ trait MpgsGateway {
         ];
 
         $response = $this->request_api($url, $method, $data);
-       
-        if ($response->result === 'SUCCESS' && $response->status === 'VALID') return $response;
+
+        if ($response->result === 'SUCCESS' && $response->status === 'VALID') {
+            return $response;
+        }
     }
 
     public function delete($token)
@@ -74,75 +75,74 @@ trait MpgsGateway {
         $response = $this->request_api($url, $method);
 
         $result['success'] = true;
-        if ($response->result !== 'SUCCESS'){
+        if ($response->result !== 'SUCCESS') {
             $result['success'] = false;
             $result['message'] = 'Your card can`t delete!';
             //$result['error_message'] = [$verify->error->cause => [$verify->error->explanation]];
-        } 
+        }
 
         return $result;
     }
 
-    public function authorize($info,$token)
+    public function authorize($info, $token)
     {
         $url = "{$this->config['url']}{$this->config['merchant_id']}/order/{$info['order_id']}/transaction/{$info['transaction_id']}";
 
         $method = 'PUT';
         $data = [
             'apiOperation' => 'AUTHORIZE',
-            'order' => [
+            'order'        => [
                 'currency' => 'MMK',
-                'amount' => $info['amount']
+                'amount'   => $info['amount'],
             ],
             'sourceOfFunds' => [
-                'token' => $token,
+                'token'    => $token,
                 'provided' => [
-                    'card' => [ 
-                        'storedOnFile' => 'STORED'
-                    ]
-                ]
+                    'card' => [
+                        'storedOnFile' => 'STORED',
+                    ],
+                ],
             ],
             'transaction' => [
-                'source' => 'MERCHANT'
+                'source' => 'MERCHANT',
             ],
             'agreement' => [
                 'type' => 'RECURRING',
-                'id' => $info['agreement_id']
-            ]
+                'id'   => $info['agreement_id'],
+            ],
         ];
-       
-        return $this->request_api($url, $method, $data);
 
+        return $this->request_api($url, $method, $data);
     }
 
-    public function agreement($info,$token)
+    public function agreement($info, $token)
     {
         $url = "{$this->config['url']}{$this->config['merchant_id']}/order/{$info['order_id']}/transaction/{$info['transaction_id']}";
 
         $method = 'PUT';
         $data = [
             'apiOperation' => 'AUTHORIZE',
-            'order' => [
+            'order'        => [
                 'currency' => 'MMK',
-                'amount' => $info['amount']
+                'amount'   => $info['amount'],
             ],
             'sourceOfFunds' => [
-                'token' => $token,
+                'token'    => $token,
                 'provided' => [
-                    'card' => [ 
-                        'storedOnFile' => 'TO_BE_STORED'
-                    ]
-                ]
+                    'card' => [
+                        'storedOnFile' => 'TO_BE_STORED',
+                    ],
+                ],
             ],
             'transaction' => [
-                'source' => 'INTERNET'
+                'source' => 'INTERNET',
             ],
             'agreement' => [
                 'type' => 'RECURRING',
-                'id' => $info['agreement_id']
-            ]
+                'id'   => $info['agreement_id'],
+            ],
         ];
-      
+
         return $this->request_api($url, $method, $data);
     }
 
@@ -153,12 +153,12 @@ trait MpgsGateway {
         $method = 'PUT';
         $data = [
             'apiOperation' => 'CAPTURE',
-            'transaction' => [
+            'transaction'  => [
                 'currency' => 'MMK',
-                'amount' => $info['amount']
-            ]
+                'amount'   => $info['amount'],
+            ],
         ];
-      
+
         return $this->request_api($url, $method, $data);
     }
 
@@ -169,15 +169,15 @@ trait MpgsGateway {
         $method = 'PUT';
         $data = [
             'apiOperation' => 'PAY',
-            'order' => [
+            'order'        => [
                 'currency' => 'MMK',
-                'amount' => $info['amount']
+                'amount'   => $info['amount'],
             ],
             'sourceOfFunds' => [
-                'token' => $token
+                'token' => $token,
             ],
         ];
-       
+
         return $this->request_api($url, $method, $data);
     }
 
@@ -188,37 +188,38 @@ trait MpgsGateway {
         $method = 'PUT';
         $data = [
             'apiOperation' => 'AUTHORIZE',
-            'order' => [
+            'order'        => [
                 'currency' => 'MMK',
-                'amount' => $info['amount']
+                'amount'   => $info['amount'],
             ],
             'sourceOfFunds' => [
-                'token' => $token
+                'token' => $token,
             ],
         ];
-       
+
         return $this->request_api($url, $method, $data);
     }
 
-    private function request_api($url,$method,$data=[])
+    private function request_api($url, $method, $data = [])
     {
         $data = json_encode($data);
-        $client = new Client;   
+        $client = new Client();
         $header = [
-            'Authorization' => 'Basic ' . base64_encode($this->config['basic_auth']),
-            'Content-Type' => 'Application/json;charset=UTF-8',
+            'Authorization'  => 'Basic '.base64_encode($this->config['basic_auth']),
+            'Content-Type'   => 'Application/json;charset=UTF-8',
             'Content-Length' => strlen($data),
         ];
 
         try {
-            if ($method == "GET") {
+            if ($method == 'GET') {
                 $response = $client->get($url);
-            }else{
-                $response = $client->request($method,$url,['body' => $data,'headers'=>$header]);  
+            } else {
+                $response = $client->request($method, $url, ['body' => $data, 'headers'=>$header]);
             }
-            return json_decode( $response->getBody()->getContents());
+
+            return json_decode($response->getBody()->getContents());
         } catch (ClientException $e) {
-            return json_decode( $e->getResponse()->getBody()->getContents());
-        }  
+            return json_decode($e->getResponse()->getBody()->getContents());
+        }
     }
 }
