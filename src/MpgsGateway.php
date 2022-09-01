@@ -200,7 +200,6 @@ trait MpgsGateway
         return $this->request_api($url, $method, $data);
     }
 
-
     public function refund($info)
     {
         $url = "{$this->config['url']}{$this->config['merchant_id']}/order/{$info['order_id']}/transaction/{$info['transaction_id']}";
@@ -208,9 +207,9 @@ trait MpgsGateway
         $method = 'PUT';
         $data = [
             'apiOperation' => 'REFUND',
-            'transaction' => [
+            'transaction'  => [
                 'currency' => 'MMK',
-                'amount' => $info['amount'],
+                'amount'   => $info['amount'],
             ],
         ];
 
@@ -224,7 +223,7 @@ trait MpgsGateway
         $method = 'PUT';
         $data = [
             'apiOperation' => 'VOID',
-            'transaction' => [
+            'transaction'  => [
                 'targetTransactionId' => $info['target_transaction_id'],
             ],
         ];
