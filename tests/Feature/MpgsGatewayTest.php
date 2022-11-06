@@ -17,9 +17,9 @@ class MpgsGatewayTest extends TestCase
     public function test_verify()
     {
         $mock = Gateway::shouldReceive('request')->once()->andReturnSelf();
-        
+
         $mock->shouldReceive('verify')->once()->with(['verify'])->andReturn([
-            'success' => true
+            'success' => true,
         ]);
 
         Gateway::request()->verify(['verify']);
@@ -30,9 +30,9 @@ class MpgsGatewayTest extends TestCase
     public function test_get_token()
     {
         $mock = Gateway::shouldReceive('request')->once()->andReturnSelf();
-        
+
         $mock->shouldReceive('getToken')->once()->with(['token'])->andReturn([
-            'success' => true
+            'success' => true,
         ]);
 
         Gateway::request()->getToken(['token']);
@@ -43,9 +43,9 @@ class MpgsGatewayTest extends TestCase
     public function test_delete()
     {
         $mock = Gateway::shouldReceive('request')->once()->andReturnSelf();
-        
+
         $mock->shouldReceive('delete')->once()->with(['delete'])->andReturn([
-            'success' => true
+            'success' => true,
         ]);
 
         Gateway::request()->delete(['delete']);
@@ -56,9 +56,9 @@ class MpgsGatewayTest extends TestCase
     public function test_authorize()
     {
         $mock = Gateway::shouldReceive('request')->once()->andReturnSelf();
-        
+
         $mock->shouldReceive('authorize')->once()->with(['authorize'], 'token')->andReturn([
-            'success' => true
+            'success' => true,
         ]);
 
         Gateway::request()->authorize(['authorize'], 'token');
@@ -69,9 +69,9 @@ class MpgsGatewayTest extends TestCase
     public function test_agreement()
     {
         $mock = Gateway::shouldReceive('request')->once()->andReturnSelf();
-        
+
         $mock->shouldReceive('agreement')->once()->with(['agreement'], 'token')->andReturn([
-            'success' => true
+            'success' => true,
         ]);
 
         Gateway::request()->agreement(['agreement'], 'token');
@@ -82,9 +82,9 @@ class MpgsGatewayTest extends TestCase
     public function test_capture()
     {
         $mock = Gateway::shouldReceive('request')->once()->andReturnSelf();
-        
+
         $mock->shouldReceive('capture')->once()->with(['capture'])->andReturn([
-            'success' => true
+            'success' => true,
         ]);
 
         Gateway::request()->capture(['capture']);
@@ -95,9 +95,9 @@ class MpgsGatewayTest extends TestCase
     public function test_pay()
     {
         $mock = Gateway::shouldReceive('request')->once()->andReturnSelf();
-        
+
         $mock->shouldReceive('pay')->once()->with(['pay'], 'token')->andReturn([
-            'success' => true
+            'success' => true,
         ]);
 
         Gateway::request()->pay(['pay'], 'token');
@@ -108,9 +108,9 @@ class MpgsGatewayTest extends TestCase
     public function test_refund()
     {
         $mock = Gateway::shouldReceive('request')->once()->andReturnSelf();
-        
+
         $mock->shouldReceive('refund')->once()->with(['refund'])->andReturn([
-            'success' => true
+            'success' => true,
         ]);
 
         Gateway::request()->refund(['refund']);
@@ -121,9 +121,9 @@ class MpgsGatewayTest extends TestCase
     public function test_prepay()
     {
         $mock = Gateway::shouldReceive('request')->once()->andReturnSelf();
-        
+
         $mock->shouldReceive('prepay')->once()->with(['prepay'], 'token')->andReturn([
-            'success' => true
+            'success' => true,
         ]);
 
         Gateway::request()->prepay(['prepay'], 'token');
@@ -134,9 +134,9 @@ class MpgsGatewayTest extends TestCase
     public function test_void()
     {
         $mock = Gateway::shouldReceive('request')->once()->andReturnSelf();
-        
+
         $mock->shouldReceive('void')->once()->with(['void'])->andReturn([
-            'success' => true
+            'success' => true,
         ]);
 
         Gateway::request()->void(['void']);
