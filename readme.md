@@ -31,3 +31,13 @@ You can also use your ConfigProvider to set certain keys.
 The defaults configuration settings are set in `config/payment.php`. Copy this file to your own config directory to modify the values. You can publish the config using this command:
 
     php artisan vendor:publish --provider="Yomafleet\PaymentProvider\PaymentGatewayServiceProvider"
+
+## Testing
+
+``` bash
+$ ./vendor/bin/phpunit
+```
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
