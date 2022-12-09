@@ -5,10 +5,11 @@ namespace Yomafleet\PaymentProvider;
 class Gateway
 {
     use MpgsGateway;
+    use MPUGateway;
 
-    public function request()
+    public function request($method=null)
     {
-        $default = config('payment.default');
+        $default = $method ?? config('payment.default');
         $this->setConfig(config('payment.'.$default));
 
         return $this;

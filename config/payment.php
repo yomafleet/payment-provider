@@ -25,4 +25,9 @@ return [
     'kbz' => [
         'url' => env('KBZ_GATEWAY_URL'),
     ],
+    'mpu' => [
+        'url' => env('MPU_GATEWAY_URL'),
+        'merchant_id' => env('MPU_MERCHANT_ID'),
+        'secret' => env('MPU_MERCHANT_SECRET'),
+    ],
 ];
