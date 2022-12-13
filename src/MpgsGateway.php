@@ -231,6 +231,31 @@ trait MpgsGateway
         return $this->request_api($url, $method, $data);
     }
 
+    public function session()
+    {
+        $url = "{$this->config['url']}{$this->config['merchant_id']}/session";
+       
+        $method = 'POST';
+        
+        $data = [
+            'session' => [
+                'authenticationLimit' => $this->config['auth_attempts']
+            ]
+        ];
+        
+        $response = $this->request_api($url, $method, $data);
+        
+        if ($response->result !== 'SUCCESS') {
+            return [
+                'success'       => false,
+                'message'       => 'Your card issuer bank has declined. Please contact your bank for support.',
+                'error_message' => isset($response->error) ? $response->error->explanation : null,
+            ];
+        }
+
+        return $response;
+    }
+
     private function request_api($url, $method, $data = [])
     {
         $data = json_encode($data);
