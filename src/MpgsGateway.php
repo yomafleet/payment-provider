@@ -256,6 +256,85 @@ trait MpgsGateway
         return $response;
     }
 
+    public function initAuthenticate($attributes)
+    {
+        $url = "{$this->config['url']}{$this->config['merchant_id']}/order/{$attributes['order_id']}/transaction/{$attributes['transaction_id']}";
+
+        $method = 'PUT';
+
+        $data = [
+            'authentication' => [
+                'channel' => 'PAYER_BROWSER'
+            ],
+            'apiOperation' => 'INITIATE_AUTHENTICATION',
+            'order'        => [
+                'currency' => 'MMK'
+            ],
+            'session' => [
+                'id' => $attributes['session_id'],
+            ]
+        ];
+        
+        $response = $this->request_api($url, $method, $data);
+        
+        if ($response->result !== 'SUCCESS') {
+            return [
+                'success'       => false,
+                'message'       => 'Your card issuer bank has declined. Please contact your bank for support.',
+                'error_message' => isset($response->error) ? $response->error->explanation : null,
+            ];
+        }
+
+        return $response;
+    }
+
+    public function initPayer($attributes)
+    {
+        $url = "{$this->config['url']}{$this->config['merchant_id']}/order/{$attributes['order_id']}/transaction/{$attributes['transaction_id']}";
+
+        $method = 'PUT';
+
+        $data = [
+            "authentication" => [
+                "redirectResponseUrl" => $this->config['callback_url']
+            ],
+            'apiOperation' => 'AUTHENTICATE_PAYER',
+            'order'        => [
+                'currency' => 'MMK',
+                'amount' => 10
+            ],
+            'session' => [
+                'id' => $attributes['session_id'],
+            ],
+            'device' => [
+                'browser' => 'MOZILLA',
+                'browserDetails' => [
+                    '3DSecureChallengeWindowSize' => 'FULL_SCREEN',
+                    'acceptHeaders' => 'application/json',
+                    'colorDepth' => '24',
+                    "javaEnabled" => true,
+                    "language" => "en-US",
+                    "screenHeight" => 640,
+                    "screenWidth" => 480,
+                    "timeZone" => 273
+                ],
+                "ipAddress" => "127.0.0.1"
+            ]
+        ];
+
+        $response = $this->request_api($url, $method, $data);
+        
+        if ($response->result !== 'PENDING') {
+            return [
+                'success'       => false,
+                'message'       => 'Your card issuer bank has declined. Please contact your bank for support.',
+                'error_message' => isset($response->error) ? $response->error->explanation : null,
+            ];
+        }
+
+        return $response;
+    }
+
     private function request_api($url, $method, $data = [])
     {
         $data = json_encode($data);

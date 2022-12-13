@@ -5,7 +5,7 @@ namespace Yomafleet\PaymentProvider;
 class Gateway
 {
     use MpgsGateway;
-    use MPUGateway;
+    //use MPUGateway;
 
     public function request($method=null)
     {

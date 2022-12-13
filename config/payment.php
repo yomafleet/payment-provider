@@ -21,6 +21,7 @@ return [
         'basic_auth'  => env('MPGS_BASIC_AUTH'),
         'js_url'      => env('MPGS_GATEWAY_JS_URL'),
         'auth_attempts' => env('MPGS_AUTH_LIMIT', 3),
+        'callback_url' => env('MPGS_CALLBACK_URL', 'http://127.0.0.1')
     ],
 
     'kbz' => [
