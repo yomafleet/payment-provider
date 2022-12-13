@@ -20,6 +20,7 @@ return [
         'password'    => env('MPGS_PASSWORD'),
         'basic_auth'  => env('MPGS_BASIC_AUTH'),
         'js_url'      => env('MPGS_GATEWAY_JS_URL'),
+        'auth_attempts' => env('MPGS_AUTH_LIMIT', 3),
     ],
 
     'kbz' => [
