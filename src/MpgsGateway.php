@@ -288,7 +288,7 @@ trait MpgsGateway
         return $response;
     }
 
-    public function initPayer($attributes)
+    public function authPayer($attributes)
     {
         $url = "{$this->config['url']}{$this->config['merchant_id']}/order/{$attributes['order_id']}/transaction/{$attributes['transaction_id']}";
 
@@ -325,6 +325,39 @@ trait MpgsGateway
         $response = $this->request_api($url, $method, $data);
         
         if ($response->result !== 'PENDING') {
+            return [
+                'success'       => false,
+                'message'       => 'Your card issuer bank has declined. Please contact your bank for support.',
+                'error_message' => isset($response->error) ? $response->error->explanation : null,
+            ];
+        }
+
+        return $response;
+    }
+
+    public function initPay($attributes)
+    {
+        $url = "{$this->config['url']}{$this->config['merchant_id']}/order/{$attributes['order_id']}/transaction/{$attributes['transaction_id']}";
+
+        $method = 'PUT';
+
+        $data = [
+            "authentication" => [
+                "transactionId" => $attributes['threeds2_transaction_id']
+            ],
+            'apiOperation' => 'PAY',
+            'order'        => [
+                'currency' => 'MMK',
+                'amount' => $attributes['amount']
+            ],
+            'session' => [
+                'id' => $attributes['session_id'],
+            ]
+        ];
+
+        $response = $this->request_api($url, $method, $data);
+        
+        if ($response->result !== 'SUCCESS') {
             return [
                 'success'       => false,
                 'message'       => 'Your card issuer bank has declined. Please contact your bank for support.',
