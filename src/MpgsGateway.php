@@ -301,7 +301,7 @@ trait MpgsGateway
             'apiOperation' => 'AUTHENTICATE_PAYER',
             'order'        => [
                 'currency' => 'MMK',
-                'amount' => 10
+                'amount' => $attributes['amount']
             ],
             'session' => [
                 'id' => $attributes['session_id'],
