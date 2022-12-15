@@ -348,10 +348,14 @@ trait MpgsGateway
             'apiOperation' => 'PAY',
             'order'        => [
                 'currency' => 'MMK',
-                'amount' => $attributes['amount']
+                'amount' => $attributes['amount'],
+                'reference' => $attributes['order_id']
             ],
             'session' => [
                 'id' => $attributes['session_id'],
+            ],
+            'transaction' => [
+                'reference' => $attributes['order_id']
             ]
         ];
 
