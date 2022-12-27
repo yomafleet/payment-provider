@@ -227,17 +227,17 @@ trait MpgsGateway
     public function session()
     {
         $url = "{$this->config['url']}{$this->config['merchant_id']}/session";
-       
+
         $method = 'POST';
-        
+
         $data = [
             'session' => [
-                'authenticationLimit' => $this->config['auth_attempts']
-            ]
+                'authenticationLimit' => $this->config['auth_attempts'],
+            ],
         ];
-        
+
         $response = $this->request_api($url, $method, $data);
-        
+
         if ($response->result !== 'SUCCESS') {
             return [
                 'success'       => false,
@@ -257,19 +257,19 @@ trait MpgsGateway
 
         $data = [
             'authentication' => [
-                'channel' => 'PAYER_BROWSER'
+                'channel' => 'PAYER_BROWSER',
             ],
             'apiOperation' => 'INITIATE_AUTHENTICATION',
             'order'        => [
-                'currency' => 'MMK'
+                'currency' => 'MMK',
             ],
             'session' => [
                 'id' => $attributes['session_id'],
-            ]
+            ],
         ];
-        
+
         $response = $this->request_api($url, $method, $data);
-        
+
         if ($response->result !== 'SUCCESS') {
             return [
                 'success'       => false,
@@ -288,35 +288,35 @@ trait MpgsGateway
         $method = 'PUT';
 
         $data = [
-            "authentication" => [
-                "redirectResponseUrl" => $this->config['callback_url']
+            'authentication' => [
+                'redirectResponseUrl' => $this->config['callback_url'],
             ],
             'apiOperation' => 'AUTHENTICATE_PAYER',
             'order'        => [
                 'currency' => 'MMK',
-                'amount' => 10
+                'amount'   => 10,
             ],
             'session' => [
                 'id' => $attributes['session_id'],
             ],
             'device' => [
-                'browser' => 'MOZILLA',
+                'browser'        => 'MOZILLA',
                 'browserDetails' => [
                     '3DSecureChallengeWindowSize' => 'FULL_SCREEN',
-                    'acceptHeaders' => 'application/json',
-                    'colorDepth' => '24',
-                    "javaEnabled" => true,
-                    "language" => "en-US",
-                    "screenHeight" => 640,
-                    "screenWidth" => 480,
-                    "timeZone" => 273
+                    'acceptHeaders'               => 'application/json',
+                    'colorDepth'                  => '24',
+                    'javaEnabled'                 => true,
+                    'language'                    => 'en-US',
+                    'screenHeight'                => 640,
+                    'screenWidth'                 => 480,
+                    'timeZone'                    => 273,
                 ],
-                "ipAddress" => "127.0.0.1"
-            ]
+                'ipAddress' => '127.0.0.1',
+            ],
         ];
 
         $response = $this->request_api($url, $method, $data);
-        
+
         if ($response->result !== 'PENDING') {
             return [
                 'success'       => false,
@@ -335,21 +335,21 @@ trait MpgsGateway
         $method = 'PUT';
 
         $data = [
-            "authentication" => [
-                "transactionId" => $attributes['threeds2_transaction_id']
+            'authentication' => [
+                'transactionId' => $attributes['threeds2_transaction_id'],
             ],
             'apiOperation' => 'PAY',
             'order'        => [
                 'currency' => 'MMK',
-                'amount' => $attributes['amount']
+                'amount'   => $attributes['amount'],
             ],
             'session' => [
                 'id' => $attributes['session_id'],
-            ]
+            ],
         ];
 
         $response = $this->request_api($url, $method, $data);
-        
+
         if ($response->result !== 'SUCCESS') {
             return [
                 'success'       => false,

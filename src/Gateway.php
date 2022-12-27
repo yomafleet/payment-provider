@@ -2,7 +2,6 @@
 
 namespace Yomafleet\PaymentProvider;
 
-
 class Gateway
 {
     use MpgsGateway;

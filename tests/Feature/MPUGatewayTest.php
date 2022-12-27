@@ -19,7 +19,7 @@ class MPUGatewayTest extends TestCase
     {
         $gw = Gateway::request('mpu');
         $data = [
-            'callback' => 'http://example.com/cb'
+            'callback' => 'http://example.com/cb',
         ];
 
         $view = $gw->prepare($data);
@@ -32,9 +32,9 @@ class MPUGatewayTest extends TestCase
     {
         $gw = Gateway::request('mpu');
         $data = [
-            'invoiceNo' => '221227129210009',
+            'invoiceNo'   => '221227129210009',
             'productDesc' => '221227129210009',
-            'amount' => 10000
+            'amount'      => 10000,
         ];
 
         $view = $gw->inquiry($data);
