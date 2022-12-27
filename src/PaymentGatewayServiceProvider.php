@@ -22,8 +22,10 @@ class PaymentGatewayServiceProvider extends ServiceProvider
         $this->mergeConfigFrom($source, 'payment');
         
         $this->publishes([
-            __DIR__.'/../views' => resource_path('views/payment'),
+            __DIR__.'/../views' => resource_path('views/vendor/payment'),
         ]);
+
+        $this->loadViewsFrom(__DIR__.'/../views', 'payment');
     }
 
     /**

@@ -8,13 +8,6 @@ use GuzzleHttp\TransferStats;
 
 trait MPUGateway
 {
-    public $config;
-
-    public function setConfig($config)
-    {
-        $this->config = $config;
-    }
-
     /**
      * Preparing and sending payment
      * @param array $request
@@ -30,7 +23,7 @@ trait MPUGateway
             'callback' => $request['callback'],
         ];
         
-        return view('payment.mpu.checkout', compact('config'));
+        return view('payment::mpu.checkout', compact('config'));
     }
 
     /**
@@ -106,7 +99,7 @@ trait MPUGateway
             'gateway_url' => $this->config['url']
         ];
         
-        return view('payment.mpu.processing', compact('post', 'config'));
+        return view('payment::mpu.processing', compact('post', 'config'));
     }
 
     private function withClient($post)

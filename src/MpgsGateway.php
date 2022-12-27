@@ -7,13 +7,6 @@ use GuzzleHttp\Exception\ClientException;
 
 trait MpgsGateway
 {
-    public $config;
-
-    public function setConfig($config)
-    {
-        $this->config = $config;
-    }
-
     public function verify($attributes)
     {
         $url = "{$this->config['url']}{$this->config['merchant_id']}/order/{$attributes['order_id']}/transaction/{$attributes['transaction_id']}";
