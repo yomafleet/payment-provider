@@ -23,7 +23,7 @@ class MPUGatewayTest extends TestCase
         ];
 
         $view = $gw->prepare($data);
-        $viewData = $view->getData()['config'];
+        $viewData = $view->getData()['data'];
 
         $this->assertEqualsCanonicalizing($data, $viewData);
     }
@@ -37,10 +37,10 @@ class MPUGatewayTest extends TestCase
             'amount'      => 10000,
         ];
 
-        $view = $gw->pay($data);
+        $view = $gw->mpuPay($data);
         $viewData = $view->getData();
 
         $this->assertArrayHasKey('post', $viewData);
-        $this->assertArrayHasKey('config', $viewData);
+        $this->assertArrayHasKey('url', $viewData);
     }
 }
