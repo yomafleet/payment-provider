@@ -28,7 +28,7 @@ class MPUGatewayTest extends TestCase
         $this->assertEqualsCanonicalizing($data, $viewData);
     }
 
-    public function test_gateway_inquiry_for_mpu_transaction_via_web_interface()
+    public function test_gateway_pay_for_mpu_transaction_via_web_interface()
     {
         $gw = Gateway::request('mpu');
         $data = [
@@ -37,7 +37,7 @@ class MPUGatewayTest extends TestCase
             'amount'      => 10000,
         ];
 
-        $view = $gw->inquiry($data);
+        $view = $gw->pay($data);
         $viewData = $view->getData();
 
         $this->assertArrayHasKey('post', $viewData);

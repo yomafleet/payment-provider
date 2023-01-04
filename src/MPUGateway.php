@@ -7,6 +7,12 @@ use GuzzleHttp\TransferStats;
 
 trait MPUGateway
 {
+    protected $payPath = 'Payment/Payment/pay';
+
+    protected $actionPath = 'Payment/Action/api';
+
+    protected $mmkCode = '104';
+
     /**
      * Preparing and sending payment.
      *
@@ -20,64 +26,85 @@ trait MPUGateway
             return false;
         }
 
-        $config = [
-            'callback' => $request['callback'],
+        return view('payment::mpu.checkout', ['data' => $request]);
+    }
+
+    public function makePayRequest(array $payload)
+    {
+        $this->payValidation($payload);
+
+        $payload = [
+            'invoiceNo'    => $payload['invoiceNo'],
+            'productDesc'  => $payload['productDesc'],
+            'amount'       => $payload['amount'],
+            'userDefined1' => isset($payload['userDefined1']) ? $payload['userDefined1'] : '',
+            'userDefined2' => isset($payload['userDefined2']) ? $payload['userDefined2'] : '',
+            'userDefined3' => isset($payload['userDefined3']) ? $payload['userDefined3'] : '',
+            'userDefined3' => isset($payload['userDefined3']) ? $payload['userDefined3'] : '',
+            'FrontendURL' => isset($payload['frontendURL']) ? $payload['frontendURL'] : '',
+            'BackendURL' => isset($payload['backendURL']) ? $payload['backendURL'] : '',
         ];
 
-        return view('payment::mpu.checkout', compact('config'));
+        $url = rtrim($this->config['url'], '/') . '/' . $this->payPath;
+
+        return [$payload, $url];
     }
 
     /**
-     * Inquiry Request/Response.
+     * Sale Request/Response.
      *
      * @param array $request
      *
-     * @return view
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
      */
-    public function inquiry($request)
+    public function mpuPay($request)
     {
-        $this->validation($request);
-
-        $post = [
-            'merchantID'   => $this->config['merchant_id'],
-            'invoiceNo'    => $request['invoiceNo'],
-            'productDesc'  => $request['productDesc'],
-            'amount'       => $request['amount'],
-            'currencyCode' => 104, // mmk format
-            'userDefined1' => array_key_exists('userDefined1', $request) ? $request['userDefined1'] : '',
-            'userDefined2' => array_key_exists('userDefined2', $request) ? $request['userDefined2'] : '',
-            'userDefined3' => array_key_exists('userDefined3', $request) ? $request['userDefined3'] : '',
-        ];
-
-        return $this->withForm($post);
+        return $this->withForm(...$this->makePayRequest($request));
     }
 
-    private function create_signature_string($input_fields_array)
+    public function wrapPayload($data)
     {
-        sort($input_fields_array, SORT_STRING);
+        $data['merchantID'] = $this->config['merchant_id'];
+        $data['currencyCode'] = $this->mmkCode;
 
-        $signature_string = '';
-
-        foreach ($input_fields_array as $value) {
-            if ($value != '') {
-                $signature_string .= $value;
-            }
+        if (isset($data['invoiceNo'])) {
+            $data['invoiceNo'] = $this->padToFitLength($data['invoiceNo'], 20);
         }
 
-        return $signature_string;
+        if (isset($data['amount'])) {
+            $decimalizedAmount = $data['amount'] * 100;
+            $data['amount'] = $this->padToFitLength($decimalizedAmount, 12);
+        }
+
+        $data = array_filter($data);
+
+        $data['hashValue'] = $this->generateHashValue($data);
+
+        return $data;
     }
 
-    private function generate_hash_value($input_fields_array)
+    private function padToFitLength($toPad, $length)
     {
-        $signature_string = $this->create_signature_string($input_fields_array);
-
-        $hash_value = hash_hmac('sha1', $signature_string, $this->config['secret'], false);
-        $hash_value = strtoupper($hash_value);
-
-        return $hash_value;
+        return str_pad($toPad, $length, '0', STR_PAD_LEFT);
     }
 
-    private function validation($request)
+    private function createSignatureString($fields)
+    {
+        sort($fields, SORT_STRING);
+
+        return implode('', array_filter($fields));
+    }
+
+    private function generateHashValue($fields)
+    {
+        $signature = $this->createSignatureString($fields);
+
+        $signed = hash_hmac('sha1', $signature, $this->config['secret'], false);
+
+        return urlencode(strtoupper($signed));
+    }
+
+    public function payValidation($request)
     {
         if (!array_key_exists('invoiceNo', $request)) {
             return false;
@@ -92,17 +119,14 @@ trait MPUGateway
         }
     }
 
-    private function withForm($post)
+    private function withForm($post, $url)
     {
-        $config = [
-            'secret'      => $this->config['secret'],
-            'gateway_url' => $this->config['url'],
-        ];
+        $this->wrapPayload($post);
 
-        return view('payment::mpu.processing', compact('post', 'config'));
+        return view('payment::mpu.processing', compact('post', 'url'));
     }
 
-    private function withClient($post)
+    private function withClient($post, $url)
     {
         $client = new Client([
             'allow_redirects'=> true,
@@ -110,11 +134,11 @@ trait MPUGateway
 
         $redir = '';
 
-        $client->post($this->config['url'], [
+        $client->post($url, [
             'on_stats' => function (TransferStats $stats) use (&$redir) {
                 $redir = (string) $stats->getEffectiveUri();
             },
-            'form_params' => array_merge($post, ['hashValue' => $this->generate_hash_value($post)]),
+            'form_params' => array_merge($post, ['hashValue' => $this->generateHashValue($post)]),
         ]);
 
         return redirect($redir);
