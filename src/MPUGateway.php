@@ -41,11 +41,11 @@ trait MPUGateway
             'userDefined2' => isset($payload['userDefined2']) ? $payload['userDefined2'] : '',
             'userDefined3' => isset($payload['userDefined3']) ? $payload['userDefined3'] : '',
             'userDefined3' => isset($payload['userDefined3']) ? $payload['userDefined3'] : '',
-            'FrontendURL' => isset($payload['frontendURL']) ? $payload['frontendURL'] : '',
-            'BackendURL' => isset($payload['backendURL']) ? $payload['backendURL'] : '',
+            'FrontendURL'  => isset($payload['frontendURL']) ? $payload['frontendURL'] : '',
+            'BackendURL'   => isset($payload['backendURL']) ? $payload['backendURL'] : '',
         ];
 
-        $url = rtrim($this->config['url'], '/') . '/' . $this->payPath;
+        $url = rtrim($this->config['url'], '/').'/'.$this->payPath;
 
         return [$payload, $url];
     }
