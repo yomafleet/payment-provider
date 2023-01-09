@@ -79,6 +79,7 @@ trait MPUGateway
         $data = array_filter($data);
 
         $data['hashValue'] = $this->generateHashValue($data);
+        $data['Version'] = '2.8';
 
         return $data;
     }
@@ -99,9 +100,7 @@ trait MPUGateway
     {
         $signature = $this->createSignatureString($fields);
 
-        $signed = hash_hmac('sha1', $signature, $this->config['secret'], false);
-
-        return urlencode(strtoupper($signed));
+        return hash_hmac('sha1', $signature, $this->config['secret'], false);
     }
 
     public function payValidation($request)
