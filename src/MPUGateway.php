@@ -34,15 +34,15 @@ trait MPUGateway
         $this->payValidation($payload);
 
         $payload = [
-            'invoiceNo'    => $payload['invoiceNo'],
+            'invoiceNo'    => $this->padToFitLength($payload['invoiceNo'], 20),
             'productDesc'  => $payload['productDesc'],
-            'amount'       => $payload['amount'],
+            'amount'       => $this->padToFitLength($payload['amount'] * 100, 12),
             'userDefined1' => isset($payload['userDefined1']) ? $payload['userDefined1'] : '',
             'userDefined2' => isset($payload['userDefined2']) ? $payload['userDefined2'] : '',
             'userDefined3' => isset($payload['userDefined3']) ? $payload['userDefined3'] : '',
             'userDefined3' => isset($payload['userDefined3']) ? $payload['userDefined3'] : '',
-            'FrontendURL'  => isset($payload['frontendURL']) ? $payload['frontendURL'] : '',
-            'BackendURL'   => isset($payload['backendURL']) ? $payload['backendURL'] : '',
+            'frontendURL'  => isset($payload['frontendURL']) ? $payload['frontendURL'] : '',
+            'backendURL'   => isset($payload['backendURL']) ? $payload['backendURL'] : '',
         ];
 
         $url = rtrim($this->config['url'], '/').'/'.$this->payPath;
@@ -66,15 +66,6 @@ trait MPUGateway
     {
         $data['merchantID'] = $this->config['merchant_id'];
         $data['currencyCode'] = $this->mmkCode;
-
-        if (isset($data['invoiceNo'])) {
-            $data['invoiceNo'] = $this->padToFitLength($data['invoiceNo'], 20);
-        }
-
-        if (isset($data['amount'])) {
-            $decimalizedAmount = $data['amount'] * 100;
-            $data['amount'] = $this->padToFitLength($decimalizedAmount, 12);
-        }
 
         $data = array_filter($data);
 
