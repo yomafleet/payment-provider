@@ -4,8 +4,8 @@ namespace Yomafleet\PaymentProvider\Tests\Feature;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
-use Yomafleet\PaymentProvider\Tests\TestCase;
 use Yomafleet\PaymentProvider\Facades\Gateway;
+use Yomafleet\PaymentProvider\Tests\TestCase;
 
 class KpayTest extends TestCase
 {
@@ -18,11 +18,11 @@ class KpayTest extends TestCase
         Config::set(
             'payment.kpay',
             [
-                'url' => 'http://api.kbzpay.com/payment/gateway/uat',
-                'app_id' => 'kpf4c8c1bfcb0842d29262c210f374c9',
-                'app_key' => 'Yomacarshare@123',
+                'url'           => 'http://api.kbzpay.com/payment/gateway/uat',
+                'app_id'        => 'kpf4c8c1bfcb0842d29262c210f374c9',
+                'app_key'       => 'Yomacarshare@123',
                 'merchant_code' => '200268',
-                'pwa_url' => 'https://static.kbzpay.com/pgw/uat/pwa/#/',
+                'pwa_url'       => 'https://static.kbzpay.com/pgw/uat/pwa/#/',
             ]
         );
 
@@ -44,19 +44,19 @@ class KpayTest extends TestCase
     public function test_kpay_can_sign_given_envelope()
     {
         $envelope = [
-            "timestamp" => time(),
-            "notify_url" => "http://localhost/v2/payment/callback/kpay/NEW",
-            "nonce_str" => "845255910308564481",
-            "sign_type" => "SHA256",
-            "method" => "kbz.payment.precreate",
-            "version" => "1.0",
-            "biz_content" => [
-                "merch_order_id" => "201811212009001",
-                "merch_code" => "100001",
-                "appid" => "kp123456789987654321abcdefghijkl",
-                "trade_type" => "APPH5",
-                "total_amount" => "1000",
-                "trans_currency" => "MMK",
+            'timestamp'   => time(),
+            'notify_url'  => 'http://localhost/v2/payment/callback/kpay/NEW',
+            'nonce_str'   => '845255910308564481',
+            'sign_type'   => 'SHA256',
+            'method'      => 'kbz.payment.precreate',
+            'version'     => '1.0',
+            'biz_content' => [
+                'merch_order_id' => '201811212009001',
+                'merch_code'     => '100001',
+                'appid'          => 'kp123456789987654321abcdefghijkl',
+                'trade_type'     => 'APPH5',
+                'total_amount'   => '1000',
+                'trans_currency' => 'MMK',
             ],
         ];
 
@@ -69,15 +69,15 @@ class KpayTest extends TestCase
     public function test_kpay_precreate_transaction()
     {
         Http::fake([
-            '*' => Http::response(['Response' => ['result' => 'SUCCESS']])
+            '*' => Http::response(['Response' => ['result' => 'SUCCESS']]),
         ]);
 
         $json = $this->gw->precreate([
-            "orderId" => 'NEW-' . time(),
-            "title" => "Example Item",
-            "amount" => "1000",
-            "type" => "NEW",
-            "callbackUrl" => "http://localhost/v2/payment/callback/kpay/NEW",
+            'orderId'     => 'NEW-'.time(),
+            'title'       => 'Example Item',
+            'amount'      => '1000',
+            'type'        => 'NEW',
+            'callbackUrl' => 'http://localhost/v2/payment/callback/kpay/NEW',
         ]);
 
         $this->assertEquals('SUCCESS', $json['Response']['result']);
@@ -86,7 +86,7 @@ class KpayTest extends TestCase
     public function test_kpay_place_order_transaction()
     {
         ['url' => $url] = $this->gw->withPWALink([
-            'prepay_id' => 'KBZ002dd5799389686cf806eff3fd6eabacf3094235191'
+            'prepay_id' => 'KBZ002dd5799389686cf806eff3fd6eabacf3094235191',
         ]);
 
         $this->assertNotFalse(filter_var($url, FILTER_VALIDATE_URL));
@@ -98,18 +98,18 @@ class KpayTest extends TestCase
         $qrCode = '1234567890qwertyuiopasdfghjklzxcvbnm';
         Http::fake([
             '*' => Http::response(['Response' => [
-                'result' => 'SUCCESS',
+                'result'    => 'SUCCESS',
                 'prepay_id' => $preId,
-                'qrCode' => $qrCode
-            ]])
+                'qrCode'    => $qrCode,
+            ]]),
         ]);
 
         ['prepay_id' => $id, 'qr_code' => $code] = $this->gw->pay([
-            "orderId" => 'NEW-' . time(),
-            "title" => "Example",
-            "amount" => "1000",
-            "type" => "NEW",
-            "callbackUrl" => "http://localhost/v2/payment/callback/kpay/NEW",
+            'orderId'     => 'NEW-'.time(),
+            'title'       => 'Example',
+            'amount'      => '1000',
+            'type'        => 'NEW',
+            'callbackUrl' => 'http://localhost/v2/payment/callback/kpay/NEW',
         ]);
 
         $this->assertEquals($preId, $id);
@@ -121,18 +121,18 @@ class KpayTest extends TestCase
         $preId = '123123';
         Http::fake([
             '*' => Http::response(['Response' => [
-                'result' => 'SUCCESS',
+                'result'    => 'SUCCESS',
                 'prepay_id' => $preId,
-            ]])
+            ]]),
         ]);
 
         ['prepay_id' => $id, 'url' => $url] = $this->gw->pay([
-            "orderId" => 'NEW-' . time(),
-            "title" => "Example",
-            "amount" => "1000",
-            "type" => "NEW",
-            "callbackUrl" => "http://localhost/v2/payment/callback/kpay/NEW",
-            "usePwa" => 1,
+            'orderId'     => 'NEW-'.time(),
+            'title'       => 'Example',
+            'amount'      => '1000',
+            'type'        => 'NEW',
+            'callbackUrl' => 'http://localhost/v2/payment/callback/kpay/NEW',
+            'usePwa'      => 1,
         ]);
 
         $this->assertEquals($preId, $id);

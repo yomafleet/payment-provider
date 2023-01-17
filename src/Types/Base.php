@@ -16,6 +16,7 @@ abstract class Base
     private function fetchConfig()
     {
         $name = (new ReflectionClass(static::class))->getShortName();
+
         return config('payment.'.\strtolower($name)) ?: [];
     }
 }

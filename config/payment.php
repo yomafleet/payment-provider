@@ -31,10 +31,10 @@ return [
     ],
 
     'kpay' => [
-        'url' => env('KPAY_GATEWAY_URL'),
-        'app_id' => env('KPAY_APP_ID'),
-        'app_key' => env('KPAY_APP_KEY'),
+        'url'           => env('KPAY_GATEWAY_URL'),
+        'app_id'        => env('KPAY_APP_ID'),
+        'app_key'       => env('KPAY_APP_KEY'),
         'merchant_code' => env('MPU_MERCHANT_ID'),
-        'pwa_url' => env('KPAY_PWA_URL', 'https://static.kbzpay.com/pgw/uat/pwa/#/'),
+        'pwa_url'       => env('KPAY_PWA_URL', 'https://static.kbzpay.com/pgw/uat/pwa/#/'),
     ],
 ];

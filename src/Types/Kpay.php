@@ -2,8 +2,8 @@
 
 namespace Yomafleet\PaymentProvider\Types;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class Kpay extends Base
 {
@@ -27,84 +27,87 @@ class Kpay extends Base
         $payload['tradeType'] = $usePwa ? self::PWA_TRADE : self::QR_TRADE;
 
         $response = $this->precreate($payload);
-        
+
         if ('SUCCESS' !== $response['Response']['result']) {
             return false;
         }
 
         $prepayId = $response['Response']['prepay_id'];
-        
+
         return $usePwa
                 ? $this->withPWALink(['prepay_id' => $prepayId])
                 : ['prepay_id' => $prepayId, 'qr_code' => $response['Response']['qrCode']];
     }
 
     /**
-     * Precreate order
+     * Precreate order.
      *
      * @param array $payload [orderId, title, amount, type, callbackUrl]
+     *
      * @return string
      */
     public function precreate($payload)
     {
         $content = [
-            'merch_order_id' => $payload['orderId'],
-            'merch_code' => $this->config['merchant_code'],
-            'appid' => $this->config['app_id'],
-            'trade_type' => $payload['tradeType'] ?? self::QR_TRADE,
-            'title' => $payload['title'],
-            'total_amount' => $payload['amount'],
-            'trans_currency' => self::CURRENCY,
+            'merch_order_id'  => $payload['orderId'],
+            'merch_code'      => $this->config['merchant_code'],
+            'appid'           => $this->config['app_id'],
+            'trade_type'      => $payload['tradeType'] ?? self::QR_TRADE,
+            'title'           => $payload['title'],
+            'total_amount'    => $payload['amount'],
+            'trans_currency'  => self::CURRENCY,
             'timeout_express' => self::TIMEOUT,
-            'callback_info' => urlencode("type={$payload['type']}"),
+            'callback_info'   => urlencode("type={$payload['type']}"),
         ];
 
         $data = $this->addSignToPayload([
-            'timestamp' => time(),
-            'notify_url' => $payload['callbackUrl'],
-            'method' => 'kbz.payment.precreate',
-            'nonce_str' => $this->generateNonce(),
-            'sign_type' => self::SIGN_TYPE,
-            'version' => self::VERSION,
+            'timestamp'   => time(),
+            'notify_url'  => $payload['callbackUrl'],
+            'method'      => 'kbz.payment.precreate',
+            'nonce_str'   => $this->generateNonce(),
+            'sign_type'   => self::SIGN_TYPE,
+            'version'     => self::VERSION,
             'biz_content' => $content,
         ]);
 
         return $this->post(
-            $this->config['url'] . '/precreate',
+            $this->config['url'].'/precreate',
             $this->wrapPayload($data)
         );
     }
 
     /**
-     * Place order in PWAAPP flow, expects an intermediate Kpay Page url
+     * Place order in PWAAPP flow, expects an intermediate Kpay Page url.
      *
      * @param array $data ['prepay_id']
+     *
      * @return array [$url]
      */
     public function withPWALink($data)
     {
         $signature = $this->generateSignature([
-            'prepay_id' => $data['prepay_id'],
+            'prepay_id'  => $data['prepay_id'],
             'merch_code' => $this->config['merchant_code'],
-            'appid' => $this->config['app_id'],
-            'timestamp' => time(),
-            'nonce_str' => $this->generateNonce(),
+            'appid'      => $this->config['app_id'],
+            'timestamp'  => time(),
+            'nonce_str'  => $this->generateNonce(),
         ]);
 
         $sign = $this->sign($signature);
 
-        $queryString = $signature . "&sign=" . $sign;
+        $queryString = $signature.'&sign='.$sign;
 
         return [
             'prepay_id' => $data['prepay_id'],
-            'url' => $this->config['pwa_url'] . '?' . $queryString,
+            'url'       => $this->config['pwa_url'].'?'.$queryString,
         ];
     }
 
     /**
-     * Generate NONCE string
+     * Generate NONCE string.
      *
-     * @param integer $max
+     * @param int $max
+     *
      * @return string
      */
     public function generateNonce($max = 32)
@@ -117,7 +120,7 @@ class Kpay extends Base
         }
 
         $random = Str::random($max - strlen($time));
-        
+
         return "{$random}{$time}";
     }
 
@@ -125,20 +128,22 @@ class Kpay extends Base
      * Sign the signature string according to Kpay.
      *
      * @param string $signature
+     *
      * @return string
      */
     public function sign($signature)
     {
         return strtoupper(hash(
             strtolower(self::SIGN_TYPE),
-            $signature . "&key={$this->config['app_key']}"
+            $signature."&key={$this->config['app_key']}"
         ));
     }
 
     /**
-     * Generate singature string from envelope
+     * Generate singature string from envelope.
      *
      * @param array $envelope
+     *
      * @return string
      */
     public function generateSignature($envelope)
@@ -156,22 +161,24 @@ class Kpay extends Base
     }
 
     /**
-     * Wrap payload with a key according to Kpay provider, while adding signed string
+     * Wrap payload with a key according to Kpay provider, while adding signed string.
      *
      * @param array $payload
+     *
      * @return array
      */
     protected function wrapPayload($payload)
     {
         return [
-            self::PAYLOAD_WRAP_KEY => $payload
+            self::PAYLOAD_WRAP_KEY => $payload,
         ];
     }
 
     /**
-     * Add sign to payload
+     * Add sign to payload.
      *
      * @param array $payload
+     *
      * @return string
      */
     protected function addSignToPayload($payload)
@@ -185,10 +192,11 @@ class Kpay extends Base
     }
 
     /**
-     * Post request to given url as json type
+     * Post request to given url as json type.
      *
      * @param string $url
-     * @param array $data
+     * @param array  $data
+     *
      * @return array
      */
     protected function post($url, $data)
