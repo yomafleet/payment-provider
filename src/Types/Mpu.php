@@ -1,11 +1,11 @@
 <?php
 
-namespace Yomafleet\PaymentProvider;
+namespace Yomafleet\PaymentProvider\Types;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\TransferStats;
 
-trait MPUGateway
+class Mpu extends Base
 {
     protected $payPath = 'Payment/Payment/pay';
 

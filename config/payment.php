@@ -24,12 +24,17 @@ return [
         'callback_url'  => env('MPGS_CALLBACK_URL', 'http://127.0.0.1'),
     ],
 
-    'kbz' => [
-        'url' => env('KBZ_GATEWAY_URL'),
-    ],
     'mpu' => [
         'url'         => env('MPU_GATEWAY_URL'),
         'merchant_id' => env('MPU_MERCHANT_ID'),
         'secret'      => env('MPU_MERCHANT_SECRET'),
+    ],
+
+    'kpay' => [
+        'url' => env('KPAY_GATEWAY_URL'),
+        'app_id' => env('KPAY_APP_ID'),
+        'app_key' => env('KPAY_APP_KEY'),
+        'merchant_code' => env('MPU_MERCHANT_ID'),
+        'pwa_url' => env('KPAY_PWA_URL', 'https://static.kbzpay.com/pgw/uat/pwa/#/'),
     ],
 ];
