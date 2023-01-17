@@ -3,7 +3,6 @@
 namespace Yomafleet\PaymentProvider\Types;
 
 use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 
 class Kpay extends Base
@@ -12,13 +11,33 @@ class Kpay extends Base
 
     public const SIGN_TYPE = 'SHA256';
 
-    public const TRADE_TYPE = 'PWAAPP';
+    public const PWA_TRADE = 'PWAAPP';
+
+    public const QR_TRADE = 'PAY_BY_QRCODE';
 
     public const CURRENCY = 'MMK';
 
     public const TIMEOUT = '60m';
 
     public const PAYLOAD_WRAP_KEY = 'Request';
+
+    public function pay($payload)
+    {
+        $usePwa = $payload['usePwa'] ?? false;
+        $payload['tradeType'] = $usePwa ? self::PWA_TRADE : self::QR_TRADE;
+
+        $response = $this->precreate($payload);
+        
+        if ('SUCCESS' !== $response['Response']['result']) {
+            return false;
+        }
+
+        $prepayId = $response['Response']['prepay_id'];
+        
+        return $usePwa
+                ? $this->withPWALink(['prepay_id' => $prepayId])
+                : ['prepay_id' => $prepayId, 'qr_code' => $response['Response']['qrCode']];
+    }
 
     /**
      * Precreate order
@@ -32,7 +51,7 @@ class Kpay extends Base
             'merch_order_id' => $payload['orderId'],
             'merch_code' => $this->config['merchant_code'],
             'appid' => $this->config['app_id'],
-            'trade_type' => self::TRADE_TYPE,
+            'trade_type' => $payload['tradeType'] ?? self::QR_TRADE,
             'title' => $payload['title'],
             'total_amount' => $payload['amount'],
             'trans_currency' => self::CURRENCY,
@@ -56,10 +75,16 @@ class Kpay extends Base
         );
     }
 
-    public function placeOrder($prepayId)
+    /**
+     * Place order in PWAAPP flow, expects an intermediate Kpay Page url
+     *
+     * @param array $data ['prepay_id']
+     * @return array [$url]
+     */
+    public function withPWALink($data)
     {
         $signature = $this->generateSignature([
-            'prepay_id' => $prepayId,
+            'prepay_id' => $data['prepay_id'],
             'merch_code' => $this->config['merchant_code'],
             'appid' => $this->config['app_id'],
             'timestamp' => time(),
@@ -70,7 +95,10 @@ class Kpay extends Base
 
         $queryString = $signature . "&sign=" . $sign;
 
-        return $this->config['pwa_url'] . '?' . $queryString;
+        return [
+            'prepay_id' => $data['prepay_id'],
+            'url' => $this->config['pwa_url'] . '?' . $queryString,
+        ];
     }
 
     /**

@@ -85,8 +85,57 @@ class KpayTest extends TestCase
 
     public function test_kpay_place_order_transaction()
     {
-        $url = $this->gw->placeOrder('KBZ002dd5799389686cf806eff3fd6eabacf3094235191');
+        ['url' => $url] = $this->gw->withPWALink([
+            'prepay_id' => 'KBZ002dd5799389686cf806eff3fd6eabacf3094235191'
+        ]);
 
+        $this->assertNotFalse(filter_var($url, FILTER_VALIDATE_URL));
+    }
+
+    public function test_kpay_pay_with_qr()
+    {
+        $preId = '123123';
+        $qrCode = '1234567890qwertyuiopasdfghjklzxcvbnm';
+        Http::fake([
+            '*' => Http::response(['Response' => [
+                'result' => 'SUCCESS',
+                'prepay_id' => $preId,
+                'qrCode' => $qrCode
+            ]])
+        ]);
+
+        ['prepay_id' => $id, 'qr_code' => $code] = $this->gw->pay([
+            "orderId" => 'NEW-' . time(),
+            "title" => "Example",
+            "amount" => "1000",
+            "type" => "NEW",
+            "callbackUrl" => "http://localhost/v2/payment/callback/kpay/NEW",
+        ]);
+
+        $this->assertEquals($preId, $id);
+        $this->assertEquals($qrCode, $code);
+    }
+
+    public function test_kpay_pay_with_pwa()
+    {
+        $preId = '123123';
+        Http::fake([
+            '*' => Http::response(['Response' => [
+                'result' => 'SUCCESS',
+                'prepay_id' => $preId,
+            ]])
+        ]);
+
+        ['prepay_id' => $id, 'url' => $url] = $this->gw->pay([
+            "orderId" => 'NEW-' . time(),
+            "title" => "Example",
+            "amount" => "1000",
+            "type" => "NEW",
+            "callbackUrl" => "http://localhost/v2/payment/callback/kpay/NEW",
+            "usePwa" => 1,
+        ]);
+
+        $this->assertEquals($preId, $id);
         $this->assertNotFalse(filter_var($url, FILTER_VALIDATE_URL));
     }
 }
