@@ -92,7 +92,7 @@ class KpayTest extends TestCase
         $this->assertNotFalse(filter_var($url, FILTER_VALIDATE_URL));
     }
 
-    public function  test_kpay_pay_with_qr()
+    public function test_kpay_pay_with_qr()
     {
         $preId = '123123';
         $qrCode = '1234567890qwertyuiopasdfghjklzxcvbnm';

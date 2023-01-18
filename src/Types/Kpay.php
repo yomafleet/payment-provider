@@ -2,9 +2,9 @@
 
 namespace Yomafleet\PaymentProvider\Types;
 
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class Kpay extends Base
 {
@@ -81,6 +81,7 @@ class Kpay extends Base
      * Generate QR with SVG string.
      *
      * @param array $data
+     *
      * @return array
      */
     public function withQrSvg($data)
@@ -88,7 +89,7 @@ class Kpay extends Base
         $filePath = $this->config['qr']['file_path'];
 
         if ($filePath) {
-            $filePath = rtrim($filePath, '/') . '/' . $data['prepay_id'] . '.svg';
+            $filePath = rtrim($filePath, '/').'/'.$data['prepay_id'].'.svg';
         }
 
         $data['qr_code'] = (string) QrCode::generate($data['qr_code'], $filePath);
