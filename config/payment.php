@@ -36,5 +36,8 @@ return [
         'app_key'       => env('KPAY_APP_KEY'),
         'merchant_code' => env('MPU_MERCHANT_ID'),
         'pwa_url'       => env('KPAY_PWA_URL', 'https://static.kbzpay.com/pgw/uat/pwa/#/'),
+        'qr'            => [
+            'file_path'  => null,
+        ],
     ],
 ];

@@ -2,6 +2,7 @@
 
 namespace Yomafleet\PaymentProvider\Types;
 
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -36,7 +37,7 @@ class Kpay extends Base
 
         return $usePwa
                 ? $this->withPWALink(['prepay_id' => $prepayId])
-                : ['prepay_id' => $prepayId, 'qr_code' => $response['Response']['qrCode']];
+                : $this->withQrSvg(['prepay_id' => $prepayId, 'qr_code' => $response['Response']['qrCode']]);
     }
 
     /**
@@ -74,6 +75,25 @@ class Kpay extends Base
             $this->config['url'].'/precreate',
             $this->wrapPayload($data)
         );
+    }
+
+    /**
+     * Generate QR with SVG string.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function withQrSvg($data)
+    {
+        $filePath = $this->config['qr']['file_path'];
+
+        if ($filePath) {
+            $filePath = rtrim($filePath, '/') . '/' . $data['prepay_id'] . '.svg';
+        }
+
+        $data['qr_code'] = (string) QrCode::generate($data['qr_code'], $filePath);
+
+        return $data;
     }
 
     /**
