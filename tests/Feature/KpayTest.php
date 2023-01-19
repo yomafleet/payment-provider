@@ -112,8 +112,6 @@ class KpayTest extends TestCase
             'callbackUrl' => 'http://localhost/v2/payment/callback/kpay/NEW',
         ]);
 
-        dd($code);
-
         $this->assertEquals($preId, $id);
         $this->assertEquals($qrCode, $code);
     }
