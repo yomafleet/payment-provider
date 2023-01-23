@@ -4,6 +4,7 @@ namespace Yomafleet\PaymentProvider\Tests\Feature;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Yomafleet\PaymentProvider\Facades\Gateway;
 use Yomafleet\PaymentProvider\Tests\TestCase;
 
@@ -19,10 +20,13 @@ class KpayTest extends TestCase
             'payment.kpay',
             [
                 'url'           => 'http://api.kbzpay.com/payment/gateway/uat',
-                'app_id'        => 'kpf4c8c1bfcb0842d29262c210f374c9',
-                'app_key'       => 'Yomacarshare@123',
-                'merchant_code' => '200268',
+                'app_id'        => 'example_id',
+                'app_key'       => 'example_key',
+                'merchant_code' => '12345678',
                 'pwa_url'       => 'https://static.kbzpay.com/pgw/uat/pwa/#/',
+                'qr'            => [
+                    'file_path'  => null,
+                ],
             ]
         );
 
@@ -96,6 +100,7 @@ class KpayTest extends TestCase
     {
         $preId = '123123';
         $qrCode = '1234567890qwertyuiopasdfghjklzxcvbnm';
+
         Http::fake([
             '*' => Http::response(['Response' => [
                 'result'    => 'SUCCESS',
@@ -103,6 +108,8 @@ class KpayTest extends TestCase
                 'qrCode'    => $qrCode,
             ]]),
         ]);
+
+        QrCode::shouldReceive('generate')->once()->andReturn($qrCode);
 
         ['prepay_id' => $id, 'qr_code' => $code] = $this->gw->pay([
             'orderId'     => 'NEW-'.time(),
