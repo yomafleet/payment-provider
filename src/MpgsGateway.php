@@ -324,15 +324,15 @@ trait MpgsGateway
 
         $response = $this->request_api($url, $method, $data);
 
-        if ($response->result !== 'PENDING' || $response->result !== 'SUCCESS') {
-            return [
-                'success'       => false,
-                'message'       => 'Your card issuer bank has declined. Please contact your bank for support.',
-                'error_message' => isset($response->error) ? $response->error->explanation : null,
-            ];
+        if ($response->result == 'PENDING' || $response->result == 'SUCCESS') {
+            return $response;
         }
 
-        return $response;
+        return [
+            'success'       => false,
+            'message'       => 'Your card issuer bank has declined. Please contact your bank for support.',
+            'error_message' => isset($response->error) ? $response->error->explanation : null,
+        ];
     }
 
     public function initPay($attributes)
