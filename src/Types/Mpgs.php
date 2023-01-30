@@ -318,7 +318,7 @@ class Mpgs extends Base
         $response = $this->requestApi($url, $method, $data);
 
         if ($response->result == 'PENDING' || $response->result == 'SUCCESS') {
-            return $response; 
+            return $response;
         }
 
         return [
