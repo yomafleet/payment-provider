@@ -7,7 +7,7 @@ class Gateway
     use MpgsGateway;
     //use MPUGateway;
 
-    public function request($method=null)
+    public function request($method = null)
     {
         $default = $method ?? config('payment.default');
         $this->setConfig(config('payment.'.$default));
