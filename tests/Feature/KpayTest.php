@@ -145,4 +145,27 @@ class KpayTest extends TestCase
         $this->assertEquals($preId, $id);
         $this->assertNotFalse(filter_var($url, FILTER_VALIDATE_URL));
     }
+
+    public function test_kpay_with_in_app()
+    {
+        $preId = '123123';
+        Http::fake([
+            '*' => Http::response(['Response' => [
+                'result'    => 'SUCCESS',
+                'prepay_id' => $preId,
+            ]]),
+        ]);
+
+        $response = $this->gw->pay([
+            'orderId'       => 'NEW-'.time(),
+            'title'         => 'Example',
+            'amount'        => '1000',
+            'type'          => 'NEW',
+            'callbackUrl'   => 'http://localhost/v2/payment/callback/kpay/NEW',
+            'useInApp'      => 1,
+        ]);
+
+        $this->assertEquals($preId, $response['order_info']['prepay_id']);
+        $this->assertTrue(is_string($response['sign']));
+    }
 }

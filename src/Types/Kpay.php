@@ -14,6 +14,8 @@ class Kpay extends Base
 
     public const PWA_TRADE = 'PWAAPP';
 
+    public const APP_TRADE = 'APP';
+
     public const QR_TRADE = 'PAY_BY_QRCODE';
 
     public const CURRENCY = 'MMK';
@@ -24,8 +26,51 @@ class Kpay extends Base
 
     public function pay($payload)
     {
-        $usePwa = $payload['usePwa'] ?? false;
-        $payload['tradeType'] = $usePwa ? self::PWA_TRADE : self::QR_TRADE;
+        // prioritized order by trade type - 'in-app', 'pwa', 'qr'
+        if ($payload['useInApp'] ?? false) {
+            return $this->useInApp($payload);
+        }
+
+        if ($payload['usePwa'] ?? false) {
+            return $this->usePwa($payload);
+        }
+
+        return $this->useQr($payload);
+    }
+
+    protected function useInApp($payload)
+    {
+        $payload['tradeType'] = self::APP_TRADE;
+
+        $response = $this->precreate($payload);
+
+        if ('SUCCESS' !== $response['Response']['result']) {
+            return false;
+        }
+
+        $prepayId = $response['Response']['prepay_id'];
+        $orderInfo = [
+            'prepay_id'  => $prepayId,
+            'merch_code' => $this->config['merchant_code'],
+            'appid'      => $this->config['app_id'],
+            'timestamp'  => time(),
+            'nonce_str'  => $this->generateNonce(),
+        ];
+
+        $signature = $this->generateSignature($orderInfo);
+
+        $sign = $this->sign($signature);
+
+        return [
+            'order_info' => $orderInfo,
+            'sign'       => $sign,
+            'sign_type'  => self::SIGN_TYPE,
+        ];
+    }
+
+    protected function usePwa($payload)
+    {
+        $payload['tradeType'] = self::PWA_TRADE;
 
         $response = $this->precreate($payload);
 
@@ -35,9 +80,25 @@ class Kpay extends Base
 
         $prepayId = $response['Response']['prepay_id'];
 
-        return $usePwa
-                ? $this->withPWALink(['prepay_id' => $prepayId])
-                : $this->withQrSvg(['prepay_id' => $prepayId, 'qr_code' => $response['Response']['qrCode']]);
+        return $this->withPWALink(['prepay_id' => $prepayId]);
+    }
+
+    protected function useQr($payload)
+    {
+        $payload['tradeType'] = self::QR_TRADE;
+
+        $response = $this->precreate($payload);
+
+        if ('SUCCESS' !== $response['Response']['result']) {
+            return false;
+        }
+
+        $prepayId = $response['Response']['prepay_id'];
+
+        return $this->withQrSvg([
+            'prepay_id' => $prepayId,
+            'qr_code'   => $response['Response']['qrCode'],
+        ]);
     }
 
     /**
