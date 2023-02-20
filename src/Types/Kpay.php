@@ -31,12 +31,14 @@ class Kpay extends Base
 
         try { // prioritized order by trade type - 'in-app', 'pwa', 'qr'
             if ($payload['useInApp'] ?? false) {
-                $result = $this->useInApp($payload);
-            } elseif ($payload['usePwa'] ?? false) {
-                $result = $this->usePwa($payload);
-            } else {
-                $result = $this->useQr($payload);
+                return $this->useInApp($payload);
             }
+
+            if ($payload['usePwa'] ?? false) {
+                return $this->usePwa($payload);
+            }
+
+            return $this->useQr($payload);
         } catch (KpayPreCreateFailedException $exception) {
             if (is_callable($onError)) {
                 $onError($exception->getResponse());
@@ -65,8 +67,8 @@ class Kpay extends Base
 
         return [
             'order_info' => $orderInfo,
-            'sign'       => $sign,
-            'sign_type'  => self::SIGN_TYPE,
+            'sign' => $sign,
+            'sign_type' => self::SIGN_TYPE,
         ];
     }
 
@@ -87,7 +89,7 @@ class Kpay extends Base
 
         return $this->withQrSvg([
             'prepay_id' => $prepayId,
-            'qr_code'   => $response['Response']['qrCode'],
+            'qr_code' => $response['Response']['qrCode']
         ]);
     }
 
@@ -111,6 +113,13 @@ class Kpay extends Base
      */
     public function precreate($payload)
     {
+        $extra = [
+            'type' => $payload['type'] ?? '',
+            'invoice_number' => $payload['invoice_number'] ?? ''
+        ];
+
+        $callbackInfo = urlencode(http_build_query(array_filter($extra)));
+
         $content = [
             'merch_order_id'  => $payload['orderId'],
             'merch_code'      => $this->config['merchant_code'],
@@ -120,7 +129,7 @@ class Kpay extends Base
             'total_amount'    => $payload['amount'],
             'trans_currency'  => self::CURRENCY,
             'timeout_express' => self::TIMEOUT,
-            'callback_info'   => urlencode("type={$payload['type']}"),
+            'callback_info'   => $callbackInfo,
         ];
 
         $data = $this->addSignToPayload([
