@@ -5,6 +5,7 @@ namespace Yomafleet\PaymentProvider\Types;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Yomafleet\PaymentProvider\Exceptions\KpayPreCreateFailedException;
 
 class Kpay extends Base
 {
@@ -24,30 +25,33 @@ class Kpay extends Base
 
     public const PAYLOAD_WRAP_KEY = 'Request';
 
-    public function pay($payload)
+    public function pay($payload, $onError = null)
     {
-        // prioritized order by trade type - 'in-app', 'pwa', 'qr'
-        if ($payload['useInApp'] ?? false) {
-            return $this->useInApp($payload);
+        $result = false;
+
+        try { // prioritized order by trade type - 'in-app', 'pwa', 'qr'
+            if ($payload['useInApp'] ?? false) {
+                return $this->useInApp($payload);
+            }
+
+            if ($payload['usePwa'] ?? false) {
+                return $this->usePwa($payload);
+            }
+
+            return $this->useQr($payload);
+        } catch (KpayPreCreateFailedException $exception) {
+            if (is_callable($onError)) {
+                $onError($exception->getResponse());
+            }
         }
 
-        if ($payload['usePwa'] ?? false) {
-            return $this->usePwa($payload);
-        }
-
-        return $this->useQr($payload);
+        return $result;
     }
 
     protected function useInApp($payload)
     {
         $payload['tradeType'] = self::APP_TRADE;
-
-        $response = $this->precreate($payload);
-
-        if ('SUCCESS' !== $response['Response']['result']) {
-            return false;
-        }
-
+        $response = $this->preOrder($payload);
         $prepayId = $response['Response']['prepay_id'];
         $orderInfo = [
             'prepay_id'  => $prepayId,
@@ -63,21 +67,15 @@ class Kpay extends Base
 
         return [
             'order_info' => $orderInfo,
-            'sign'       => $sign,
-            'sign_type'  => self::SIGN_TYPE,
+            'sign' => $sign,
+            'sign_type' => self::SIGN_TYPE,
         ];
     }
 
     protected function usePwa($payload)
     {
         $payload['tradeType'] = self::PWA_TRADE;
-
-        $response = $this->precreate($payload);
-
-        if ('SUCCESS' !== $response['Response']['result']) {
-            return false;
-        }
-
+        $response = $this->preOrder($payload);
         $prepayId = $response['Response']['prepay_id'];
 
         return $this->withPWALink(['prepay_id' => $prepayId]);
@@ -86,19 +84,24 @@ class Kpay extends Base
     protected function useQr($payload)
     {
         $payload['tradeType'] = self::QR_TRADE;
-
-        $response = $this->precreate($payload);
-
-        if ('SUCCESS' !== $response['Response']['result']) {
-            return false;
-        }
-
+        $response = $this->preOrder($payload);
         $prepayId = $response['Response']['prepay_id'];
 
         return $this->withQrSvg([
             'prepay_id' => $prepayId,
-            'qr_code'   => $response['Response']['qrCode'],
+            'qr_code' => $response['Response']['qrCode']
         ]);
+    }
+
+    protected function preOrder($payload)
+    {
+        $response = $this->precreate($payload);
+
+        if ('SUCCESS' !== $response['Response']['result']) {
+            throw new KpayPreCreateFailedException($response);
+        }
+
+        return $response;
     }
 
     /**
