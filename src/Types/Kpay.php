@@ -67,8 +67,8 @@ class Kpay extends Base
 
         return [
             'order_info' => $orderInfo,
-            'sign' => $sign,
-            'sign_type' => self::SIGN_TYPE,
+            'sign'       => $sign,
+            'sign_type'  => self::SIGN_TYPE,
         ];
     }
 
@@ -89,7 +89,7 @@ class Kpay extends Base
 
         return $this->withQrSvg([
             'prepay_id' => $prepayId,
-            'qr_code' => $response['Response']['qrCode']
+            'qr_code'   => $response['Response']['qrCode'],
         ]);
     }
 
