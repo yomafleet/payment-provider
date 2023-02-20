@@ -168,4 +168,21 @@ class KpayTest extends TestCase
         $this->assertEquals($preId, $response['order_info']['prepay_id']);
         $this->assertTrue(is_string($response['sign']));
     }
+
+    public function test_kpay_pay_with_error_call_provided_callback()
+    {
+        Http::fake([
+            '*' => Http::response(['Response' => [
+                'result'    => 'FAILED',
+            ]]),
+        ]);
+
+        $this->gw->pay([
+            'orderId'     => 'NEW-'.time(),
+            'title'       => 'Example',
+            'amount'      => '1000',
+            'type'        => 'NEW',
+            'callbackUrl' => 'http://localhost/v2/payment/callback/kpay/NEW',
+        ], fn ($response) => $this->assertEquals('FAILED', $response['Response']['result']));
+    }
 }

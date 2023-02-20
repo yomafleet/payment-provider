@@ -31,14 +31,12 @@ class Kpay extends Base
 
         try { // prioritized order by trade type - 'in-app', 'pwa', 'qr'
             if ($payload['useInApp'] ?? false) {
-                return $this->useInApp($payload);
+                $result = $this->useInApp($payload);
+            } elseif ($payload['usePwa'] ?? false) {
+                $result = $this->usePwa($payload);
+            } else {
+                $result = $this->useQr($payload);
             }
-
-            if ($payload['usePwa'] ?? false) {
-                return $this->usePwa($payload);
-            }
-
-            return $this->useQr($payload);
         } catch (KpayPreCreateFailedException $exception) {
             if (is_callable($onError)) {
                 $onError($exception->getResponse());
