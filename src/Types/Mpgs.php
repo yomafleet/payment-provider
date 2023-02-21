@@ -1,11 +1,11 @@
 <?php
 
-namespace Yomafleet\PaymentProvider;
+namespace Yomafleet\PaymentProvider\Types;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
-trait MpgsGateway
+class Mpgs extends Base
 {
     public function verify($attributes)
     {
@@ -22,7 +22,7 @@ trait MpgsGateway
             ],
         ];
 
-        $verify = $this->request_api($url, $method, $data);
+        $verify = $this->requestApi($url, $method, $data);
 
         if ($verify->result !== 'SUCCESS') {
             return [
@@ -54,7 +54,7 @@ trait MpgsGateway
             ],
         ];
 
-        $response = $this->request_api($url, $method, $data);
+        $response = $this->requestApi($url, $method, $data);
 
         if ($response->result === 'SUCCESS' && $response->status === 'VALID') {
             return $response;
@@ -65,7 +65,7 @@ trait MpgsGateway
     {
         $url = "{$this->config['url']}{$this->config['merchant_id']}/token/{$token}";
         $method = 'DELETE';
-        $response = $this->request_api($url, $method);
+        $response = $this->requestApi($url, $method);
 
         $result['success'] = true;
         if ($response->result !== 'SUCCESS') {
@@ -105,7 +105,7 @@ trait MpgsGateway
             ],
         ];
 
-        return $this->request_api($url, $method, $data);
+        return $this->requestApi($url, $method, $data);
     }
 
     public function agreement($info, $token)
@@ -136,7 +136,7 @@ trait MpgsGateway
             ],
         ];
 
-        return $this->request_api($url, $method, $data);
+        return $this->requestApi($url, $method, $data);
     }
 
     public function capture($info)
@@ -152,7 +152,7 @@ trait MpgsGateway
             ],
         ];
 
-        return $this->request_api($url, $method, $data);
+        return $this->requestApi($url, $method, $data);
     }
 
     public function pay($info, $token)
@@ -171,7 +171,7 @@ trait MpgsGateway
             ],
         ];
 
-        return $this->request_api($url, $method, $data);
+        return $this->requestApi($url, $method, $data);
     }
 
     public function prepay($info, $token)
@@ -190,7 +190,7 @@ trait MpgsGateway
             ],
         ];
 
-        return $this->request_api($url, $method, $data);
+        return $this->requestApi($url, $method, $data);
     }
 
     public function refund($info)
@@ -206,7 +206,7 @@ trait MpgsGateway
             ],
         ];
 
-        return $this->request_api($url, $method, $data);
+        return $this->requestApi($url, $method, $data);
     }
 
     public function void($info)
@@ -221,7 +221,7 @@ trait MpgsGateway
             ],
         ];
 
-        return $this->request_api($url, $method, $data);
+        return $this->requestApi($url, $method, $data);
     }
 
     public function session()
@@ -236,7 +236,7 @@ trait MpgsGateway
             ],
         ];
 
-        $response = $this->request_api($url, $method, $data);
+        $response = $this->requestApi($url, $method, $data);
 
         if ($response->result !== 'SUCCESS') {
             return [
@@ -268,7 +268,7 @@ trait MpgsGateway
             ],
         ];
 
-        $response = $this->request_api($url, $method, $data);
+        $response = $this->requestApi($url, $method, $data);
 
         if ($response->result !== 'SUCCESS') {
             return [
@@ -315,17 +315,17 @@ trait MpgsGateway
             ],
         ];
 
-        $response = $this->request_api($url, $method, $data);
+        $response = $this->requestApi($url, $method, $data);
 
-        if ($response->result !== 'PENDING') {
-            return [
-                'success'       => false,
-                'message'       => 'Your card issuer bank has declined. Please contact your bank for support.',
-                'error_message' => isset($response->error) ? $response->error->explanation : null,
-            ];
+        if ($response->result == 'PENDING' || $response->result == 'SUCCESS') {
+            return $response;
         }
 
-        return $response;
+        return [
+            'success'       => false,
+            'message'       => 'Your card issuer bank has declined. Please contact your bank for support.',
+            'error_message' => isset($response->error) ? $response->error->explanation : null,
+        ];
     }
 
     public function initPay($attributes)
@@ -348,7 +348,7 @@ trait MpgsGateway
             ],
         ];
 
-        $response = $this->request_api($url, $method, $data);
+        $response = $this->requestApi($url, $method, $data);
 
         if ($response->result !== 'SUCCESS') {
             return [
@@ -361,7 +361,7 @@ trait MpgsGateway
         return $response;
     }
 
-    private function request_api($url, $method, $data = [])
+    private function requestApi($url, $method, $data = [])
     {
         $data = json_encode($data);
         $client = new Client();
