@@ -67,8 +67,8 @@ class Kpay extends Base
 
         return [
             'order_info' => $orderInfo,
-            'sign' => $sign,
-            'sign_type' => self::SIGN_TYPE,
+            'sign'       => $sign,
+            'sign_type'  => self::SIGN_TYPE,
         ];
     }
 
@@ -89,7 +89,7 @@ class Kpay extends Base
 
         return $this->withQrSvg([
             'prepay_id' => $prepayId,
-            'qr_code' => $response['Response']['qrCode']
+            'qr_code'   => $response['Response']['qrCode'],
         ]);
     }
 
@@ -114,8 +114,8 @@ class Kpay extends Base
     public function precreate($payload)
     {
         $extra = [
-            'type' => $payload['type'] ?? '',
-            'invoice_number' => $payload['invoice_number'] ?? ''
+            'type'           => $payload['type'] ?? '',
+            'invoice_number' => $payload['invoice_number'] ?? '',
         ];
 
         $callbackInfo = urlencode(http_build_query(array_filter($extra)));
