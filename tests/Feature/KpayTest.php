@@ -41,8 +41,8 @@ class KpayTest extends TestCase
 
     public function test_kpay_can_generate_nonce_by_given_length()
     {
-        $this->assertEquals(5, strlen($this->gw->generateNonce(5)));
-        $this->assertEquals(32, strlen($this->gw->generateNonce()));
+        $this->assertEquals(5, strlen($this->gw->sealer()->generateNonce(5)));
+        $this->assertEquals(32, strlen($this->gw->sealer()->generateNonce()));
     }
 
     public function test_kpay_can_sign_given_envelope()
@@ -64,8 +64,8 @@ class KpayTest extends TestCase
             ],
         ];
 
-        $signature = $this->gw->generateSignature($envelope, false);
-        $signed = $this->gw->sign($signature);
+        $signature = $this->gw->sealer()->generateSignature($envelope, false);
+        $signed = $this->gw->sealer()->sign($signature);
 
         $this->assertNotEmpty($signed);
     }
