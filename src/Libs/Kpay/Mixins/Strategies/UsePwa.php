@@ -14,6 +14,7 @@ trait UsePwa
      * Use PWA payment type.
      *
      * @param array $payload
+     *
      * @return array
      */
     public function usePwa($payload)

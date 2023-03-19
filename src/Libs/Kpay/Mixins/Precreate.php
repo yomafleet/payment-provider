@@ -2,10 +2,10 @@
 
 namespace Yomafleet\PaymentProvider\Libs\Kpay\Mixins;
 
-use Yomafleet\PaymentProvider\Libs\Kpay\KpayHttp;
-use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
-use Yomafleet\PaymentProvider\Libs\Kpay\KpaySealer;
 use Yomafleet\PaymentProvider\Exceptions\KpayRequestFailedException;
+use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
+use Yomafleet\PaymentProvider\Libs\Kpay\KpayHttp;
+use Yomafleet\PaymentProvider\Libs\Kpay\KpaySealer;
 
 trait Precreate
 {
@@ -19,7 +19,9 @@ trait Precreate
      * Request KPay precreate.
      *
      * @param array $payload [orderId, title, amount, type, callbackUrl]
+     *
      * @throws \Yomafleet\PaymentProvider\Exceptions\KpayRequestFailedException
+     *
      * @return array
      */
     public function precreateRequest(array $payload)
@@ -68,8 +70,9 @@ trait Precreate
     /**
      * Precreate order.
      *
-     * @param array $payload
+     * @param array          $payload
      * @param \callable|null $onError
+     *
      * @return array
      */
     public function precreate(array $payload, $onError = null)
@@ -85,4 +88,3 @@ trait Precreate
         return $response;
     }
 }
-

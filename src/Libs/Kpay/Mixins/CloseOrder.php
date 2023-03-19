@@ -2,10 +2,10 @@
 
 namespace Yomafleet\PaymentProvider\Libs\Kpay\Mixins;
 
-use Yomafleet\PaymentProvider\Libs\Kpay\KpayHttp;
-use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
-use Yomafleet\PaymentProvider\Libs\Kpay\KpaySealer;
 use Yomafleet\PaymentProvider\Exceptions\KpayRequestFailedException;
+use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
+use Yomafleet\PaymentProvider\Libs\Kpay\KpayHttp;
+use Yomafleet\PaymentProvider\Libs\Kpay\KpaySealer;
 
 trait CloseOrder
 {
@@ -19,7 +19,9 @@ trait CloseOrder
      * Close KPay order.
      *
      * @param array $payload
+     *
      * @throws \Yomafleet\PaymentProvider\Exceptions\KpayRequestFailedException
+     *
      * @return array
      */
     public function closeOrderRequest(array $payload)
@@ -54,8 +56,9 @@ trait CloseOrder
     /**
      * Close order.
      *
-     * @param array $payload
+     * @param array          $payload
      * @param \callable|null $onError
+     *
      * @return array
      */
     public function close($payload, $onError = null)

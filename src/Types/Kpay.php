@@ -6,8 +6,8 @@ use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
 use Yomafleet\PaymentProvider\Libs\Kpay\KpaySealer;
 use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\CloseOrder;
 use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Order;
-use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Refund;
 use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Precreate;
+use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Refund;
 
 class Kpay extends Base
 {
@@ -39,7 +39,7 @@ class Kpay extends Base
     }
 
     /**
-     * Get Kpay sealer
+     * Get Kpay sealer.
      *
      * @return \Yomafleet\PaymentProvider\Libs\Kpay\KpaySealer
      */

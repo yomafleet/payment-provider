@@ -27,7 +27,7 @@ class KpayTest extends TestCase
                 'qr'            => [
                     'file_path'  => null,
                 ],
-                'refund_url' => 'http://api.kbzpay.com:18008/payment/gateway/uat/refund'
+                'refund_url' => 'http://api.kbzpay.com:18008/payment/gateway/uat/refund',
             ]
         );
 
@@ -225,7 +225,7 @@ class KpayTest extends TestCase
 
         Http::fake([
             '*' => Http::response(['Response' => [
-                'result'    => 'SUCCESS',
+                'result'      => 'SUCCESS',
                 'refund_info' => [
                     'refund_request_no' => $id,
                 ],
@@ -233,7 +233,7 @@ class KpayTest extends TestCase
         ]);
 
         $response = $this->gw->query([
-            'orderId' => $id,
+            'orderId'  => $id,
             'refundId' => $id,
         ]);
 
@@ -247,14 +247,14 @@ class KpayTest extends TestCase
 
         Http::fake([
             '*' => Http::response(['Response' => [
-                'result'    => 'SUCCESS',
+                'result'        => 'SUCCESS',
                 'refund_amount' => $amount,
             ]]),
         ]);
 
         $response = $this->gw->refund([
             'orderId' => $id,
-            'amount' => $amount
+            'amount'  => $amount,
         ]);
 
         $this->assertEquals($amount, $response['Response']['refund_amount']);

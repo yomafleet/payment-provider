@@ -2,8 +2,8 @@
 
 namespace Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Strategies;
 
-use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
 
 trait UseQr
 {
@@ -13,6 +13,7 @@ trait UseQr
      * Use QR payment type.
      *
      * @param array $payload
+     *
      * @return array
      */
     public function useQr($payload)

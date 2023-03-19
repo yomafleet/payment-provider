@@ -3,7 +3,6 @@
 namespace Yomafleet\PaymentProvider\Libs\Kpay;
 
 use Illuminate\Support\Str;
-use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
 
 class KpaySealer
 {
@@ -13,6 +12,7 @@ class KpaySealer
     {
         $this->key = $signKey;
     }
+
     /**
      * Generate NONCE string.
      *

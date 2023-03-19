@@ -29,11 +29,12 @@ abstract class Base
      * Get all configs or specific one.
      *
      * @param string|null $key
+     *
      * @return string|array|null
      */
     public function getConfig($key = null)
     {
-        if (! $key) {
+        if (!$key) {
             return $this->config;
         }
 

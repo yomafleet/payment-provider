@@ -7,13 +7,14 @@ use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
 trait UseInApp
 {
     abstract public function precreateRequest(array $payload);
-    
+
     abstract public function getConfig($key = null);
 
     /**
      * Use In-App type payment.
      *
      * @param array $payload
+     *
      * @return array
      */
     public function useInApp($payload)

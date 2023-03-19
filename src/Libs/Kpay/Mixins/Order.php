@@ -2,12 +2,12 @@
 
 namespace Yomafleet\PaymentProvider\Libs\Kpay\Mixins;
 
-use Yomafleet\PaymentProvider\Libs\Kpay\KpayHttp;
-use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
-use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Strategies\UseQr;
-use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Strategies\UsePwa;
-use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Strategies\UseInApp;
 use Yomafleet\PaymentProvider\Exceptions\KpayRequestFailedException;
+use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
+use Yomafleet\PaymentProvider\Libs\Kpay\KpayHttp;
+use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Strategies\UseInApp;
+use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Strategies\UsePwa;
+use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Strategies\UseQr;
 
 trait Order
 {
@@ -16,10 +16,11 @@ trait Order
     use UsePwa;
 
     /**
-     * Order a payment transaction
+     * Order a payment transaction.
      *
-     * @param array $payload
+     * @param array          $payload
      * @param \callable|null $onError
+     *
      * @return array|false
      */
     public function pay(array $payload, $onError = null)
@@ -46,10 +47,12 @@ trait Order
     }
 
     /**
-     * Query the latest state of given order
+     * Query the latest state of given order.
      *
      * @param array $payload
+     *
      * @throws \Yomafleet\PaymentProvider\Exceptions\KpayRequestFailedException
+     *
      * @return array
      */
     public function queryOrderRequest(array $payload)
@@ -86,10 +89,11 @@ trait Order
     }
 
     /**
-     * Query the latest state of given order
+     * Query the latest state of given order.
      *
-     * @param array $payload
+     * @param array          $payload
      * @param \callable|null $onError
+     *
      * @return array
      */
     public function query(array $payload, $onError = null)
