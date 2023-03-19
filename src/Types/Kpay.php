@@ -4,13 +4,17 @@ namespace Yomafleet\PaymentProvider\Types;
 
 use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
 use Yomafleet\PaymentProvider\Libs\Kpay\KpaySealer;
-use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Precreate;
+use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\CloseOrder;
 use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Order;
+use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Refund;
+use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Precreate;
 
 class Kpay extends Base
 {
     use Precreate;
     use Order;
+    use Refund;
+    use CloseOrder;
 
     protected $sealer;
 

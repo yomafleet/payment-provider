@@ -6,7 +6,7 @@ use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
 
 trait UsePwa
 {
-    abstract public function precreate($payload);
+    abstract public function precreateRequest(array $payload);
 
     abstract public function getConfig($key = null);
 
@@ -19,7 +19,7 @@ trait UsePwa
     public function usePwa($payload)
     {
         $payload['tradeType'] = KpayConfig::PWA_TRADE;
-        $response = $this->precreate($payload);
+        $response = $this->precreateRequest($payload);
         $prepayId = $response['Response']['prepay_id'];
 
         return $this->withPWALink(['prepay_id' => $prepayId]);

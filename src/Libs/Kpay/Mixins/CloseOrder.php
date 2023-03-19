@@ -7,7 +7,7 @@ use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
 use Yomafleet\PaymentProvider\Libs\Kpay\KpaySealer;
 use Yomafleet\PaymentProvider\Exceptions\KpayRequestFailedException;
 
-trait Precreate
+trait CloseOrder
 {
     abstract public function sealer(): KpaySealer;
 
@@ -16,37 +16,23 @@ trait Precreate
     abstract public function wrapPayload($data);
 
     /**
-     * Request KPay precreate.
+     * Close KPay order.
      *
-     * @param array $payload [orderId, title, amount, type, callbackUrl]
+     * @param array $payload
      * @throws \Yomafleet\PaymentProvider\Exceptions\KpayRequestFailedException
      * @return array
      */
-    public function precreateRequest(array $payload)
+    public function closeOrderRequest(array $payload)
     {
-        $extra = [
-            'type'           => $payload['type'] ?? '',
-            'invoice_number' => $payload['invoice_number'] ?? '',
-        ];
-
-        $callbackInfo = urlencode(http_build_query(array_filter($extra)));
-
         $content = [
-            'merch_order_id'  => $payload['orderId'],
-            'merch_code'      => $this->getConfig('merchant_code'),
             'appid'           => $this->getConfig('app_id'),
-            'trade_type'      => $payload['tradeType'] ?? KpayConfig::QR_TRADE,
-            'title'           => $payload['title'],
-            'total_amount'    => $payload['amount'],
-            'trans_currency'  => KpayConfig::CURRENCY,
-            'timeout_express' => KpayConfig::TIMEOUT,
-            'callback_info'   => $callbackInfo,
+            'merch_code'      => $this->getConfig('merchant_code'),
+            'merch_order_id'  => $payload['orderId'],
         ];
 
         $data = $this->sealer()->addSignToPayload([
             'timestamp'   => time(),
-            'notify_url'  => $payload['callbackUrl'],
-            'method'      => 'kbz.payment.precreate',
+            'method'      => 'kbz.payment.closeorder',
             'nonce_str'   => $this->sealer()->generateNonce(),
             'sign_type'   => KpayConfig::SIGN_TYPE,
             'version'     => KpayConfig::VERSION,
@@ -54,28 +40,28 @@ trait Precreate
         ]);
 
         $response = KpayHttp::post(
-            $this->getConfig('url').'/precreate',
+            $this->getConfig('url').'/closeorder',
             $this->wrapPayload($data)
         );
 
         if ('SUCCESS' !== $response['Response']['result']) {
-            throw new KpayRequestFailedException('Kpay Precreate failed', $response);
+            throw new KpayRequestFailedException('Kpay order close failed!', $response);
         }
 
         return $response;
     }
 
     /**
-     * Precreate order.
+     * Close order.
      *
      * @param array $payload
      * @param \callable|null $onError
      * @return array
      */
-    public function precreate(array $payload, $onError = null)
+    public function close($payload, $onError = null)
     {
         try {
-            $response = $this->precreateRequest($payload);
+            $response = $this->closeOrderRequest($payload);
         } catch (KpayRequestFailedException $th) {
             if (is_callable($onError)) {
                 $onError($th->getResponse());
@@ -85,4 +71,3 @@ trait Precreate
         return $response;
     }
 }
-

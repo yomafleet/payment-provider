@@ -6,7 +6,7 @@ use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
 
 trait UseInApp
 {
-    abstract public function precreate($payload);
+    abstract public function precreateRequest(array $payload);
     
     abstract public function getConfig($key = null);
 
@@ -19,7 +19,7 @@ trait UseInApp
     public function useInApp($payload)
     {
         $payload['tradeType'] = KpayConfig::APP_TRADE;
-        $response = $this->precreate($payload);
+        $response = $this->precreateRequest($payload);
         $prepayId = $response['Response']['prepay_id'];
         $orderInfo = [
             'prepay_id'  => $prepayId,

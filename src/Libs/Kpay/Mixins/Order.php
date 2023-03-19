@@ -2,10 +2,12 @@
 
 namespace Yomafleet\PaymentProvider\Libs\Kpay\Mixins;
 
-use Yomafleet\PaymentProvider\Exceptions\KpayPreCreateFailedException;
-use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Strategies\UseInApp;
-use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Strategies\UsePwa;
+use Yomafleet\PaymentProvider\Libs\Kpay\KpayHttp;
+use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
 use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Strategies\UseQr;
+use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Strategies\UsePwa;
+use Yomafleet\PaymentProvider\Libs\Kpay\Mixins\Strategies\UseInApp;
+use Yomafleet\PaymentProvider\Exceptions\KpayRequestFailedException;
 
 trait Order
 {
@@ -13,7 +15,14 @@ trait Order
     use UseInApp;
     use UsePwa;
 
-    public function pay($payload, $onError = null)
+    /**
+     * Order a payment transaction
+     *
+     * @param array $payload
+     * @param \callable|null $onError
+     * @return array|false
+     */
+    public function pay(array $payload, $onError = null)
     {
         $result = false;
 
@@ -27,12 +36,72 @@ trait Order
             }
 
             return $this->useQr($payload);
-        } catch (KpayPreCreateFailedException $exception) {
+        } catch (KpayRequestFailedException $exception) {
             if (is_callable($onError)) {
                 $onError($exception->getResponse());
             }
         }
 
         return $result;
+    }
+
+    /**
+     * Query the latest state of given order
+     *
+     * @param array $payload
+     * @throws \Yomafleet\PaymentProvider\Exceptions\KpayRequestFailedException
+     * @return array
+     */
+    public function queryOrderRequest(array $payload)
+    {
+        $content = [
+            'appid'           => $this->getConfig('app_id'),
+            'merch_code'      => $this->getConfig('merchant_code'),
+            'merch_order_id'  => $payload['orderId'],
+        ];
+
+        if (array_key_exists('refundId', $payload)) {
+            $content['refund_request_no'] = $payload['refundId'];
+        }
+
+        $data = $this->sealer()->addSignToPayload([
+            'timestamp'   => time(),
+            'method'      => 'kbz.payment.queryrefund',
+            'nonce_str'   => $this->sealer()->generateNonce(),
+            'sign_type'   => KpayConfig::SIGN_TYPE,
+            'version'     => KpayConfig::VERSION,
+            'biz_content' => $content,
+        ]);
+
+        $response = KpayHttp::post(
+            $this->getConfig('url').'/queryorder',
+            $this->wrapPayload($data)
+        );
+
+        if ('SUCCESS' !== $response['Response']['result']) {
+            throw new KpayRequestFailedException('Kpay Query Order request failed', $response);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Query the latest state of given order
+     *
+     * @param array $payload
+     * @param \callable|null $onError
+     * @return array
+     */
+    public function query(array $payload, $onError = null)
+    {
+        try {
+            $response = $this->queryOrderRequest($payload);
+        } catch (KpayRequestFailedException $th) {
+            if (is_callable($onError)) {
+                $onError($th->getResponse());
+            }
+        }
+
+        return $response;
     }
 }

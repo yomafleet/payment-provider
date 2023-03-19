@@ -7,7 +7,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 trait UseQr
 {
-    abstract public function precreate($payload);
+    abstract public function precreateRequest(array $payload);
 
     /**
      * Use QR payment type.
@@ -18,7 +18,7 @@ trait UseQr
     public function useQr($payload)
     {
         $payload['tradeType'] = KpayConfig::QR_TRADE;
-        $response = $this->precreate($payload);
+        $response = $this->precreateRequest($payload);
         $prepayId = $response['Response']['prepay_id'];
 
         return $this->withQrSvg([
