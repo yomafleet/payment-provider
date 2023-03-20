@@ -24,7 +24,7 @@ trait Refund
      *
      * @return array
      */
-    protected function refundRequest(array $payload)
+    public function refundRequest(array $payload)
     {
         $content = [
             'appid'             => $this->getConfig('app_id'),
