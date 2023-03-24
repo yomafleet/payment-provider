@@ -11,7 +11,8 @@ class KpayHttp
      *
      * @param string $url
      * @param array  $data
-     * @param bool $useSSL
+     * @param bool   $useSSL
+     *
      * @return array
      */
     public static function post($url, $data, $useSSL = false)
@@ -21,8 +22,8 @@ class KpayHttp
         if ($useSSL) {
             $config = config('payment.kpay.ssl');
             $client->withOptions([
-                'cert' => $config['cert'],
-                'ssl_key' => [$config['pem'], $config['password']]
+                'cert'    => $config['cert'],
+                'ssl_key' => [$config['pem'], $config['password']],
             ]);
         }
 
