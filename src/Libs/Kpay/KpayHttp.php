@@ -11,12 +11,22 @@ class KpayHttp
      *
      * @param string $url
      * @param array  $data
-     *
+     * @param bool $useSSL
      * @return array
      */
-    public static function post($url, $data)
+    public static function post($url, $data, $useSSL = false)
     {
-        return Http::asJson()
+        $client = Http::asJson();
+
+        if ($useSSL) {
+            $config = config('payment.kpay.ssl');
+            $client->withOptions([
+                'cert' => $config['cert'],
+                'ssl_key' => [$config['pem'], $config['password']]
+            ]);
+        }
+
+        return $client
             ->post($url, $data)
             ->json();
     }

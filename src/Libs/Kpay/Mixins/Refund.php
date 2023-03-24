@@ -45,7 +45,8 @@ trait Refund
 
         $response = KpayHttp::post(
             $this->getConfig('refund_url'),
-            $this->wrapPayload($data)
+            $this->wrapPayload($data),
+            true
         );
 
         if ('SUCCESS' !== $response['Response']['result']) {
