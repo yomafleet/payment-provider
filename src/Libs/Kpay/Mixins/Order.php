@@ -69,7 +69,7 @@ trait Order
 
         $data = $this->sealer()->addSignToPayload([
             'timestamp'   => time(),
-            'method'      => 'kbz.payment.queryrefund',
+            'method'      => 'kbz.payment.queryorder',
             'nonce_str'   => $this->sealer()->generateNonce(),
             'sign_type'   => KpayConfig::SIGN_TYPE,
             'version'     => KpayConfig::VERSION,
