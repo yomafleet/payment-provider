@@ -41,9 +41,10 @@ return [
             'file_path'  => null,
         ],
         'ssl' => [
-            'cert'     => env('KPAY_CERT_PATH'),
-            'pem'      => env('KPAY_PEM_PATH'),
-            'password' => env('KPAY_PEM_PASSWORD'),
+            'cacert_path' => env('KPAY_CACERT_PATH'),
+            'key_path' => env('KPAY_KEY_PATH'),
+            'cert_path' => env('KPAY_CERT_PATH'),
+            'cert_pass' => env('KPAY_PEM_PASSWORD'),
         ],
     ],
 ];
