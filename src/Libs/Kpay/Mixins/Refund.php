@@ -27,11 +27,14 @@ trait Refund
     public function refundRequest(array $payload)
     {
         $content = [
-            'appid'             => $this->getConfig('app_id'),
-            'merch_code'        => $this->getConfig('merchant_code'),
-            'merch_order_id'    => $payload['orderId'],
-            'refund_request_no' => $payload['orderId'],
-            'refund_amount'     => $payload['amount'],
+            'appid' => $this->getConfig('app_id'),
+            'merch_code' => $this->getConfig('merchant_code'),
+            'merch_order_id' => $payload['orderId'],
+            'refund_request_no' => base64_encode($payload['orderId']),
+            'refund_amount' => $payload['amount'],
+            'refund_reason' => isset($payload['refundReason']) && $payload['refundReason']
+                ? $payload['refundReason']
+                : 'Reservation cancel'
         ];
 
         $data = $this->sealer()->addSignToPayload([
