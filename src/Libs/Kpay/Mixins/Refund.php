@@ -2,10 +2,10 @@
 
 namespace Yomafleet\PaymentProvider\Libs\Kpay\Mixins;
 
-use Yomafleet\PaymentProvider\Exceptions\KpayRequestFailedException;
-use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
 use Yomafleet\PaymentProvider\Libs\Kpay\KpayHttp;
+use Yomafleet\PaymentProvider\Libs\Kpay\KpayConfig;
 use Yomafleet\PaymentProvider\Libs\Kpay\KpaySealer;
+use Yomafleet\PaymentProvider\Exceptions\KpayRequestFailedException;
 
 trait Refund
 {
@@ -19,23 +19,24 @@ trait Refund
      * Request KPay refund.
      *
      * @param array $payload
-     *
      * @throws \Yomafleet\PaymentProvider\Exceptions\KpayRequestFailedException
-     *
      * @return array
      */
     public function refundRequest(array $payload)
     {
         $content = [
-            'appid'             => $this->getConfig('app_id'),
-            'merch_code'        => $this->getConfig('merchant_code'),
-            'merch_order_id'    => $payload['orderId'],
+            'appid' => $this->getConfig('app_id'),
+            'merch_code' => $this->getConfig('merchant_code'),
+            'merch_order_id' => $payload['orderId'],
             'refund_request_no' => base64_encode($payload['orderId']),
-            'refund_amount'     => $payload['amount'],
-            'refund_reason'     => isset($payload['refundReason']) && $payload['refundReason']
+            'refund_reason' => isset($payload['refundReason']) && $payload['refundReason']
                 ? $payload['refundReason']
-                : 'Reservation cancel',
+                : 'Reservation cancel'
         ];
+
+        if ($payload['amount']) {
+            $content['refund_amount'] = $payload['amount'];
+        }
 
         $data = $this->sealer()->addSignToPayload([
             'timestamp'   => time(),
@@ -62,9 +63,8 @@ trait Refund
     /**
      * Refund order.
      *
-     * @param array          $payload
+     * @param array $payload
      * @param \callable|null $onError
-     *
      * @return array
      */
     public function refund(array $payload, $onError = null)
