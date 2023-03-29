@@ -22,8 +22,8 @@ class KpayHttp
         if ($useSSL) {
             $config = config('payment.kpay.ssl');
             $client->withOptions([
-                'verify' => $config['cacert_path'],
-                'cert' => [$config['cert_path'], $config['cert_pass']],
+                'verify'  => $config['cacert_path'],
+                'cert'    => [$config['cert_path'], $config['cert_pass']],
                 'ssl_key' => $config['key_path'],
             ]);
         }
