@@ -6,7 +6,7 @@ use Yomafleet\PaymentProvider\Contracts\LoggerContract;
 
 class NullLogger implements LoggerContract
 {
-    public function log(string $messge, array $data)
+    public function log(string $message, array $data)
     {
     }
 }
