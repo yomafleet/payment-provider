@@ -78,7 +78,9 @@ trait Order
 
         $response = KpayHttp::post(
             $this->getConfig('url').'/queryorder',
-            $this->wrapPayload($data)
+            $this->wrapPayload($data),
+            false,
+            $this->logger,
         );
 
         if ('SUCCESS' !== $response['Response']['result']) {

@@ -57,7 +57,9 @@ trait Precreate
 
         $response = KpayHttp::post(
             $this->getConfig('url').'/precreate',
-            $this->wrapPayload($data)
+            $this->wrapPayload($data),
+            false,
+            $this->logger,
         );
 
         if ('SUCCESS' !== $response['Response']['result']) {

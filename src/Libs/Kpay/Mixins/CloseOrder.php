@@ -43,7 +43,9 @@ trait CloseOrder
 
         $response = KpayHttp::post(
             $this->getConfig('url').'/closeorder',
-            $this->wrapPayload($data)
+            $this->wrapPayload($data),
+            false,
+            $this->logger,
         );
 
         if ('SUCCESS' !== $response['Response']['result']) {

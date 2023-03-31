@@ -3,6 +3,8 @@
 namespace Yomafleet\PaymentProvider\Libs\Kpay;
 
 use Illuminate\Support\Facades\Http;
+use Yomafleet\PaymentProvider\Contracts\LoggerContract;
+use Yomafleet\PaymentProvider\Utils\NullLogger;
 
 class KpayHttp
 {
@@ -12,10 +14,11 @@ class KpayHttp
      * @param string $url
      * @param array  $data
      * @param bool   $useSSL
+     * @param LoggerContract $logger
      *
      * @return array
      */
-    public static function post($url, $data, $useSSL = false)
+    public static function post($url, $data, $useSSL = false, LoggerContract $logger = null)
     {
         $client = Http::asJson();
 
@@ -28,8 +31,19 @@ class KpayHttp
             ]);
         }
 
-        return $client
+        $response = $client
             ->post($url, $data)
             ->json();
+
+        if (! $logger) {
+            $logger = new NullLogger;
+        }
+
+        $logger->log('Kpay provider request and response', [
+            'request' => $data,
+            'response' => $response
+        ]);
+
+        return $response;
     }
 }

@@ -3,14 +3,31 @@
 namespace Yomafleet\PaymentProvider\Types;
 
 use ReflectionClass;
+use Yomafleet\PaymentProvider\Contracts\LoggerContract;
+use Yomafleet\PaymentProvider\Utils\NullLogger;
 
 abstract class Base
 {
     public $config;
 
-    public function __construct()
+    /** @var LoggerContract */
+    public $logger;
+
+    public function __construct(LoggerContract $logger = null)
     {
         $this->config = $this->fetchConfig();
+        $this->logger = $logger ?: new NullLogger();
+    }
+
+    /**
+     * Set logger
+     *
+     * @param LoggerContract $logger
+     * @return void
+     */
+    public function setLogger(LoggerContract $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
