@@ -80,4 +80,66 @@ trait Refund
 
         return $response;
     }
+
+    /**
+     * Query refund request.
+     *
+     * @param array $payload
+     * @throws \Yomafleet\PaymentProvider\Exceptions\KpayRequestFailedException
+     * @return array
+     */
+    public function queryRefundRequest(array $payload)
+    {
+        $content = [
+            'appid'           => $this->getConfig('app_id'),
+            'merch_code'      => $this->getConfig('merchant_code'),
+            'merch_order_id'  => $payload['orderId'],
+        ];
+
+        if (array_key_exists('refundId', $payload) && $payload['refundId']) {
+            $content['refund_request_no'] = $payload['refundId'];
+        }
+
+        $data = $this->sealer()->addSignToPayload([
+            'timestamp'   => time(),
+            'nonce_str'   => $this->sealer()->generateNonce(),
+            'method'      => 'kbz.payment.queryrefund',
+            'sign_type'   => KpayConfig::SIGN_TYPE,
+            'version'     => KpayConfig::VERSION,
+            'biz_content' => $content,
+        ]);
+
+        $response = KpayHttp::post(
+            $this->getConfig('url').'/queryrefund',
+            $this->wrapPayload($data),
+            false,
+            $this->logger,
+        );
+
+        if ('SUCCESS' !== $response['Response']['result']) {
+            throw new KpayRequestFailedException('Kpay Query Order request failed', $response);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Query refund order.
+     *
+     * @param array $payload
+     * @param \callable|null $onError
+     * @return array
+     */
+    public function queryRefund(array $payload, $onError = null)
+    {
+        try {
+            $response = $this->queryRefundRequest($payload);
+        } catch (KpayRequestFailedException $th) {
+            if (is_callable($onError)) {
+                $onError($th->getResponse());
+            }
+        }
+
+        return $response;
+    }
 }
