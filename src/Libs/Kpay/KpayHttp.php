@@ -36,10 +36,11 @@ class KpayHttp
             ->json();
 
         if (! $logger) {
-            $logger = new NullLogger;
+            $logger = new NullLogger();
         }
 
         $logger->log('Kpay provider request and response', [
+            'url' => $url,
             'request' => $data,
             'response' => $response
         ]);

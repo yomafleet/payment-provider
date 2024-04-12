@@ -375,10 +375,18 @@ class Mpgs extends Base
             if ($method == 'GET') {
                 $response = $client->get($url);
             } else {
-                $response = $client->request($method, $url, ['body' => $data, 'headers'=>$header]);
+                $response = $client->request($method, $url, ['body' => $data, 'headers' => $header]);
             }
 
-            return json_decode($response->getBody()->getContents());
+            $content = json_decode($response->getBody()->getContents());
+
+            $this->logger->log('MPGS provider request and response', [
+                'url' => $url,
+                'request' => $data,
+                'response' => $content,
+            ]);
+
+            return $content;
         } catch (ClientException $e) {
             return json_decode($e->getResponse()->getBody()->getContents());
         }
