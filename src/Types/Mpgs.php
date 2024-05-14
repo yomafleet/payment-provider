@@ -287,6 +287,8 @@ class Mpgs extends Base
 
         $method = 'PUT';
 
+        $amount = isset($attributes['amount']) ? $attributes['amount'] : 10;
+
         $data = [
             'authentication' => [
                 'redirectResponseUrl' => $this->config['callback_url'],
@@ -294,7 +296,7 @@ class Mpgs extends Base
             'apiOperation' => 'AUTHENTICATE_PAYER',
             'order'        => [
                 'currency' => 'MMK',
-                'amount'   => 10,
+                'amount'   => $amount,
             ],
             'session' => [
                 'id' => $attributes['session_id'],
