@@ -1,19 +1,12 @@
 <?php
 
-namespace Yomafleet\PaymentProvider;
+namespace Yomafleet\PaymentProvider\Types;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
-trait MpgsGateway
+class Mpgs extends Base
 {
-    public $config;
-
-    public function setConfig($config)
-    {
-        $this->config = $config;
-    }
-
     public function verify($attributes)
     {
         $url = "{$this->config['url']}{$this->config['merchant_id']}/order/{$attributes['order_id']}/transaction/{$attributes['transaction_id']}";
@@ -29,7 +22,7 @@ trait MpgsGateway
             ],
         ];
 
-        $verify = $this->request_api($url, $method, $data);
+        $verify = $this->requestApi($url, $method, $data);
 
         if ($verify->result !== 'SUCCESS') {
             return [
@@ -61,7 +54,7 @@ trait MpgsGateway
             ],
         ];
 
-        $response = $this->request_api($url, $method, $data);
+        $response = $this->requestApi($url, $method, $data);
 
         if ($response->result === 'SUCCESS' && $response->status === 'VALID') {
             return $response;
@@ -72,7 +65,7 @@ trait MpgsGateway
     {
         $url = "{$this->config['url']}{$this->config['merchant_id']}/token/{$token}";
         $method = 'DELETE';
-        $response = $this->request_api($url, $method);
+        $response = $this->requestApi($url, $method);
 
         $result['success'] = true;
         if ($response->result !== 'SUCCESS') {
@@ -112,7 +105,7 @@ trait MpgsGateway
             ],
         ];
 
-        return $this->request_api($url, $method, $data);
+        return $this->requestApi($url, $method, $data);
     }
 
     public function agreement($info, $token)
@@ -143,7 +136,7 @@ trait MpgsGateway
             ],
         ];
 
-        return $this->request_api($url, $method, $data);
+        return $this->requestApi($url, $method, $data);
     }
 
     public function capture($info)
@@ -159,7 +152,7 @@ trait MpgsGateway
             ],
         ];
 
-        return $this->request_api($url, $method, $data);
+        return $this->requestApi($url, $method, $data);
     }
 
     public function pay($info, $token)
@@ -178,7 +171,7 @@ trait MpgsGateway
             ],
         ];
 
-        return $this->request_api($url, $method, $data);
+        return $this->requestApi($url, $method, $data);
     }
 
     public function prepay($info, $token)
@@ -197,7 +190,7 @@ trait MpgsGateway
             ],
         ];
 
-        return $this->request_api($url, $method, $data);
+        return $this->requestApi($url, $method, $data);
     }
 
     public function refund($info)
@@ -213,7 +206,7 @@ trait MpgsGateway
             ],
         ];
 
-        return $this->request_api($url, $method, $data);
+        return $this->requestApi($url, $method, $data);
     }
 
     public function void($info)
@@ -228,10 +221,149 @@ trait MpgsGateway
             ],
         ];
 
-        return $this->request_api($url, $method, $data);
+        return $this->requestApi($url, $method, $data);
     }
 
-    private function request_api($url, $method, $data = [])
+    public function session()
+    {
+        $url = "{$this->config['url']}{$this->config['merchant_id']}/session";
+
+        $method = 'POST';
+
+        $data = [
+            'session' => [
+                'authenticationLimit' => $this->config['auth_attempts'],
+            ],
+        ];
+
+        $response = $this->requestApi($url, $method, $data);
+
+        if ($response->result !== 'SUCCESS') {
+            return [
+                'success'       => false,
+                'message'       => 'Your card issuer bank has declined. Please contact your bank for support.',
+                'error_message' => isset($response->error) ? $response->error->explanation : null,
+            ];
+        }
+
+        return $response;
+    }
+
+    public function initAuthenticate($attributes)
+    {
+        $url = "{$this->config['url']}{$this->config['merchant_id']}/order/{$attributes['order_id']}/transaction/{$attributes['transaction_id']}";
+
+        $method = 'PUT';
+
+        $data = [
+            'authentication' => [
+                'channel' => 'PAYER_BROWSER',
+            ],
+            'apiOperation' => 'INITIATE_AUTHENTICATION',
+            'order'        => [
+                'currency' => 'MMK',
+            ],
+            'session' => [
+                'id' => $attributes['session_id'],
+            ],
+        ];
+
+        $response = $this->requestApi($url, $method, $data);
+
+        if ($response->result !== 'SUCCESS') {
+            return [
+                'success'       => false,
+                'message'       => 'Your card issuer bank has declined. Please contact your bank for support.',
+                'error_message' => isset($response->error) ? $response->error->explanation : null,
+            ];
+        }
+
+        return $response;
+    }
+
+    public function authPayer($attributes)
+    {
+        $url = "{$this->config['url']}{$this->config['merchant_id']}/order/{$attributes['order_id']}/transaction/{$attributes['transaction_id']}";
+
+        $method = 'PUT';
+
+        $amount = isset($attributes['amount']) ? $attributes['amount'] : 10;
+
+        $data = [
+            'authentication' => [
+                'redirectResponseUrl' => $this->config['callback_url'],
+            ],
+            'apiOperation' => 'AUTHENTICATE_PAYER',
+            'order'        => [
+                'currency' => 'MMK',
+                'amount'   => $amount,
+            ],
+            'session' => [
+                'id' => $attributes['session_id'],
+            ],
+            'device' => [
+                'browser'        => 'MOZILLA',
+                'browserDetails' => [
+                    '3DSecureChallengeWindowSize' => 'FULL_SCREEN',
+                    'acceptHeaders'               => 'application/json',
+                    'colorDepth'                  => '24',
+                    'javaEnabled'                 => true,
+                    'language'                    => 'en-US',
+                    'screenHeight'                => 640,
+                    'screenWidth'                 => 480,
+                    'timeZone'                    => 273,
+                ],
+                'ipAddress' => '127.0.0.1',
+            ],
+        ];
+
+        $response = $this->requestApi($url, $method, $data);
+
+        if ($response->result == 'PENDING' || $response->result == 'SUCCESS') {
+            return $response;
+        }
+
+        return [
+            'success'       => false,
+            'message'       => 'Your card issuer bank has declined. Please contact your bank for support.',
+            'error_message' => isset($response->error) ? $response->error->explanation : null,
+        ];
+    }
+
+    public function initPay($attributes)
+    {
+        $url = "{$this->config['url']}{$this->config['merchant_id']}/order/{$attributes['order_id']}/transaction/{$attributes['transaction_id']}";
+
+        $method = 'PUT';
+
+        $data = [
+            'authentication' => [
+                'transactionId' => $attributes['threeds2_transaction_id'],
+            ],
+            'apiOperation' => 'PAY',
+            'order'        => [
+                'currency' => 'MMK',
+                'amount'   => $attributes['amount'],
+            ],
+            'session' => [
+                'id' => $attributes['session_id'],
+            ],
+        ];
+
+        $response = $this->requestApi($url, $method, $data);
+
+        if ($response->result !== 'SUCCESS') {
+            return [
+                'success'       => false,
+                'message'       => 'Your card issuer bank has declined. Please contact your bank for support.',
+                'error_message' => isset($response->error) ? $response->error->explanation : null,
+            ];
+        }
+
+        return $response;
+    }
+
+    private function requestApi($url, $method, $data = [])
     {
         $data = json_encode($data);
         $client = new Client();
@@ -245,10 +377,18 @@ trait MpgsGateway
             if ($method == 'GET') {
                 $response = $client->get($url);
             } else {
-                $response = $client->request($method, $url, ['body' => $data, 'headers'=>$header]);
+                $response = $client->request($method, $url, ['body' => $data, 'headers' => $header]);
             }
 
-            return json_decode($response->getBody()->getContents());
+            $content = json_decode($response->getBody()->getContents());
+
+            $this->logger->log('MPGS provider request and response', [
+                'url' => $url,
+                'request' => $data,
+                'response' => $content,
+            ]);
+
+            return $content;
         } catch (ClientException $e) {
             return json_decode($e->getResponse()->getBody()->getContents());
         }

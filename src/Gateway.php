@@ -4,18 +4,12 @@ namespace Yomafleet\PaymentProvider;
 
 class Gateway
 {
-    use MpgsGateway;
-
-    public function request()
+    public function request($method = null)
     {
-        $default = config('payment.default');
-        $this->setConfig(config('payment.'.$default));
+        $method = $method ?? config('payment.default');
+        $method = \ucfirst(\strtolower($method));
+        $name = __NAMESPACE__.'\\Types\\'.$method;
 
-        return $this;
-    }
-
-    protected function mpgs()
-    {
-        return method_exists($this, 'verify') ? true : false;
+        return new $name();
     }
 }
