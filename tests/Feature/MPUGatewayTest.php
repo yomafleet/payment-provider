@@ -23,12 +23,12 @@ class MPUGatewayTest extends TestCase
         ];
 
         $view = $gw->prepare($data);
-        $viewData = $view->getData()['config'];
+        $viewData = $view->getData()['data'];
 
         $this->assertEqualsCanonicalizing($data, $viewData);
     }
 
-    public function test_gateway_inquiry_for_mpu_transaction_via_web_interface()
+    public function test_gateway_pay_for_mpu_transaction_via_web_interface()
     {
         $gw = Gateway::request('mpu');
         $data = [
@@ -37,10 +37,10 @@ class MPUGatewayTest extends TestCase
             'amount'      => 10000,
         ];
 
-        $view = $gw->inquiry($data);
+        $view = $gw->mpuPay($data);
         $viewData = $view->getData();
 
         $this->assertArrayHasKey('post', $viewData);
-        $this->assertArrayHasKey('config', $viewData);
+        $this->assertArrayHasKey('url', $viewData);
     }
 }
