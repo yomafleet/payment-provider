@@ -27,6 +27,7 @@ class KpayTest extends TestCase
                 'qr'            => [
                     'file_path'  => null,
                 ],
+                'refund_url' => 'http://api.kbzpay.com:18008/payment/gateway/uat/refund',
             ]
         );
 
@@ -41,8 +42,8 @@ class KpayTest extends TestCase
 
     public function test_kpay_can_generate_nonce_by_given_length()
     {
-        $this->assertEquals(5, strlen($this->gw->generateNonce(5)));
-        $this->assertEquals(32, strlen($this->gw->generateNonce()));
+        $this->assertEquals(5, strlen($this->gw->sealer()->generateNonce(5)));
+        $this->assertEquals(32, strlen($this->gw->sealer()->generateNonce()));
     }
 
     public function test_kpay_can_sign_given_envelope()
@@ -64,8 +65,8 @@ class KpayTest extends TestCase
             ],
         ];
 
-        $signature = $this->gw->generateSignature($envelope, false);
-        $signed = $this->gw->sign($signature);
+        $signature = $this->gw->sealer()->generateSignature($envelope, false);
+        $signed = $this->gw->sealer()->sign($signature);
 
         $this->assertNotEmpty($signed);
     }
@@ -184,5 +185,78 @@ class KpayTest extends TestCase
             'type'        => 'NEW',
             'callbackUrl' => 'http://localhost/v2/payment/callback/kpay/NEW',
         ], fn ($response) => $this->assertEquals('FAILED', $response['Response']['result']));
+    }
+
+    public function test_kpay_can_close_order()
+    {
+        Http::fake([
+            '*' => Http::response(['Response' => [
+                'result'    => 'SUCCESS',
+                'prepay_id' => '123123123',
+            ]]),
+        ]);
+
+        $response = $this->gw->close([
+            'orderId'       => 'NEW-'.time(),
+        ]);
+
+        $this->assertEquals('123123123', $response['Response']['prepay_id']);
+    }
+
+    public function test_kpay_can_query_order()
+    {
+        Http::fake([
+            '*' => Http::response(['Response' => [
+                'result'    => 'SUCCESS',
+                'prepay_id' => '123123123',
+            ]]),
+        ]);
+
+        $response = $this->gw->query([
+            'orderId'       => 'NEW-'.time(),
+        ]);
+
+        $this->assertEquals('123123123', $response['Response']['prepay_id']);
+    }
+
+    public function test_kpay_can_query_refund_order()
+    {
+        $id = 'NEW-'.time();
+
+        Http::fake([
+            '*' => Http::response(['Response' => [
+                'result'      => 'SUCCESS',
+                'refund_info' => [
+                    'refund_request_no' => $id,
+                ],
+            ]]),
+        ]);
+
+        $response = $this->gw->query([
+            'orderId'  => $id,
+            'refundId' => $id,
+        ]);
+
+        $this->assertEquals($id, $response['Response']['refund_info']['refund_request_no']);
+    }
+
+    public function test_kpay_can_successfully_refund()
+    {
+        $id = 'NEW-'.time();
+        $amount = 1000;
+
+        Http::fake([
+            '*' => Http::response(['Response' => [
+                'result'        => 'SUCCESS',
+                'refund_amount' => $amount,
+            ]]),
+        ]);
+
+        $response = $this->gw->refund([
+            'orderId' => $id,
+            'amount'  => $amount,
+        ]);
+
+        $this->assertEquals($amount, $response['Response']['refund_amount']);
     }
 }

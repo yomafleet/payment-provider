@@ -36,8 +36,15 @@ return [
         'app_key'       => env('KPAY_APP_KEY'),
         'merchant_code' => env('KPAY_MERCHANT_CODE'),
         'pwa_url'       => env('KPAY_PWA_URL', 'https://static.kbzpay.com/pgw/uat/pwa/#/'),
+        'refund_url'    => env('KPAY_REFUND_URL'),
         'qr'            => [
             'file_path'  => null,
+        ],
+        'ssl' => [
+            'cacert_path' => env('KPAY_CACERT_PATH'),
+            'key_path'    => env('KPAY_KEY_PATH'),
+            'cert_path'   => env('KPAY_CERT_PATH'),
+            'cert_pass'   => env('KPAY_PEM_PASSWORD'),
         ],
     ],
 ];

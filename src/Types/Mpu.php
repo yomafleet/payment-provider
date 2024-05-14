@@ -109,26 +109,38 @@ class Mpu extends Base
         }
     }
 
-    private function withForm($post, $url)
+    protected function withForm($post, $url)
     {
-        $this->wrapPayload($post);
+        $post = $this->wrapPayload($post);
 
-        return view('payment::mpu.processing', compact('post', 'url'));
+        $this->logger->log('MPU provider request and response', [
+            'url' => $url,
+            'request' => $post,
+            'response' => null,
+        ]);
+
+        return view('payment::mpu.processing', ['post' => $post, 'url' => $url]);
     }
 
-    private function withClient($post, $url)
+    protected function withClient($post, $url)
     {
         $client = new Client([
-            'allow_redirects'=> true,
+            'allow_redirects' => true,
         ]);
 
         $redir = '';
-
-        $client->post($url, [
+        $data = array_merge($post, ['hashValue' => $this->generateHashValue($post)]);
+        $response = $client->post($url, [
             'on_stats' => function (TransferStats $stats) use (&$redir) {
                 $redir = (string) $stats->getEffectiveUri();
             },
-            'form_params' => array_merge($post, ['hashValue' => $this->generateHashValue($post)]),
+            'form_params' => $data,
+        ]);
+
+        $this->logger->log('MPU provider request and response', [
+            'url' => $url,
+            'request' => $data,
+            'response' => json_decode($response->getBody()->getContents()),
         ]);
 
         return redirect($redir);
